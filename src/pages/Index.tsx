@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers } from 'lucide-react';
+import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/layout/ThemeToggle';
@@ -17,6 +17,9 @@ const Index = () => {
           <Logo />
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
+            <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
+            <Button variant="ghost" onClick={() => navigate('/pricing')}>Pricing</Button>
+            <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
             <Button onClick={() => navigate('/registration')}>Get Started</Button>
           </div>
@@ -141,65 +144,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-muted/50 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">What Our Customers Say</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Thousands of businesses have simplified their compliance journey with CompliEasy.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-card p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
-                  <span className="font-semibold">RK</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Rajesh Kumar</h4>
-                  <p className="text-sm text-muted-foreground">Founder, TechSolutions Pvt Ltd</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "CompliEasy made our company registration process seamless. The compliance calendar is a lifesaver for keeping track of all regulatory filings."
-              </p>
-            </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
-                  <span className="font-semibold">SP</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Shikha Patel</h4>
-                  <p className="text-sm text-muted-foreground">Director, Innovate LLP</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "The document management system has been incredibly helpful for our team. We can access all our important documents whenever needed."
-              </p>
-            </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
-                  <span className="font-semibold">AM</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Amit Mehta</h4>
-                  <p className="text-sm text-muted-foreground">CEO, GrowFast Ventures</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground">
-                "I've recommended CompliEasy to all my entrepreneur friends. It takes the stress out of compliance management and lets us focus on growing our business."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -227,29 +171,26 @@ const Index = () => {
             <div>
               <h4 className="font-semibold mb-3">Product</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Registration</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Compliance</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Document Management</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Pricing</a></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/registration')}>Registration</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/dashboard')}>Compliance</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/documents')}>Document Management</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/pricing')}>Pricing</Button></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3">Company</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">About Us</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Careers</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Blog</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Contact</a></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/about')}>About Us</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/contact')}>Contact</Button></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-3">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Terms of Service</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Privacy Policy</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground text-sm">Cookie Policy</a></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/terms')}>Terms of Service</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/privacy')}>Privacy Policy</Button></li>
               </ul>
             </div>
           </div>
