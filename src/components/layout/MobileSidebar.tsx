@@ -1,12 +1,27 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { X, Home, ClipboardList, FileText, MessageSquare, CreditCard, Settings, Building } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { 
+  Home, 
+  ClipboardList, 
+  FileText, 
+  MessageSquare, 
+  CreditCard, 
+  Settings, 
+  Building 
+} from 'lucide-react';
 import Logo from '../Logo';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
 
 interface MobileSidebarProps {
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 const navItems = [
@@ -19,43 +34,48 @@ const navItems = [
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
-const MobileSidebar: React.FC<MobileSidebarProps> = ({ onClose }) => {
+const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-      <div className="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-card p-6 shadow-lg animate-in slide-in-from-left">
-        <div className="flex items-center justify-between mb-6">
-          <Logo />
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close menu">
-            <X className="h-5 w-5" />
-          </Button>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="left" className="p-0 w-[280px]">
+        <SheetHeader className="p-4 border-b">
+          <SheetTitle className="flex items-center justify-start">
+            <Logo />
+          </SheetTitle>
+        </SheetHeader>
+        
+        <div className="overflow-y-auto py-2">
+          <nav className="space-y-1 px-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => 
+                  `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                    isActive 
+                      ? 'bg-primary/10 text-primary font-medium' 
+                      : 'text-foreground hover:bg-muted'
+                  }`
+                }
+                onClick={() => onOpenChange(false)}
+              >
+                <item.icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
         </div>
         
-        <nav className="space-y-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => 
-                `nav-link ${isActive ? 'active' : ''}`
-              }
-              onClick={onClose}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-        
-        <div className="mt-auto pt-6 border-t mt-6">
-          <div className="px-3 py-2">
-            <div className="text-sm font-medium">Need help?</div>
-            <div className="text-xs text-muted-foreground mt-1">
+        <SheetFooter className="border-t p-4 mt-auto">
+          <div className="text-sm">
+            <div className="font-medium">Need help?</div>
+            <div className="text-muted-foreground mt-1">
               Contact your manager or our support team.
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

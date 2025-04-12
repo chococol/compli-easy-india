@@ -19,7 +19,7 @@ import {
 
 const Navbar = () => {
   const isMobile = useIsMobile();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ const Navbar = () => {
             variant="ghost" 
             size="icon" 
             className="mr-2" 
-            onClick={() => setIsMenuOpen(true)}
+            onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
@@ -81,9 +81,10 @@ const Navbar = () => {
         </div>
       </div>
       
-      {isMenuOpen && (
-        <MobileSidebar onClose={() => setIsMenuOpen(false)} />
-      )}
+      <MobileSidebar 
+        open={isMobileMenuOpen} 
+        onOpenChange={setIsMobileMenuOpen} 
+      />
     </header>
   );
 };
