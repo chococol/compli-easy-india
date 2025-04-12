@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, ChevronRight } from 'lucide-react';
+import { FileText, ChevronRight, FileCode } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Task, TaskStatus } from '@/utils/tasksService';
 
@@ -38,6 +38,12 @@ const TasksList: React.FC<TasksListProps> = ({ tasks }) => {
                     <span className="text-xs text-muted-foreground">Due: {task.dueDate}</span>
                     <TaskStatusBadge status={task.status} />
                   </div>
+                  {task.regulatoryReference && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <FileCode className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">{task.regulatoryReference}</span>
+                    </div>
+                  )}
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => navigate(`/tasks/${task.id}`)}>
                   <ChevronRight className="h-5 w-5" />

@@ -2,23 +2,33 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
 interface ComplianceHealthProps {
   score: number;
   tasksCompleted: number;
   totalTasks: number;
+  nextSteps?: string[];
 }
 
 const ComplianceHealth: React.FC<ComplianceHealthProps> = ({
   score,
   tasksCompleted,
   totalTasks,
+  nextSteps = []
 }) => {
   // Helper function to determine score color
   const getScoreColor = (value: number) => {
-    if (value >= 80) return 'text-green-600';
-    if (value >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (value >= 80) return 'text-green-600 dark:text-green-400';
+    if (value >= 60) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
+  // Helper function to determine score icon
+  const getScoreIcon = (value: number) => {
+    if (value >= 80) return <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />;
+    if (value >= 60) return <Info className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />;
+    return <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />;
   };
   
   return (
@@ -63,6 +73,25 @@ const ComplianceHealth: React.FC<ComplianceHealthProps> = ({
             </div>
             <Progress value={(tasksCompleted / totalTasks) * 100} className="h-2" />
           </div>
+
+          {nextSteps.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                {getScoreIcon(score)}
+                <span>Recommended Actions</span>
+              </h4>
+              <ul className="text-sm space-y-1.5">
+                {nextSteps.map((step, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="rounded-full bg-primary/10 text-primary px-1.5 text-xs mt-0.5">
+                      {index + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

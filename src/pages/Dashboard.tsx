@@ -6,7 +6,8 @@ import StatsCard from '@/components/dashboard/StatsCard';
 import TasksList from '@/components/dashboard/TasksList';
 import ComplianceHealth from '@/components/dashboard/ComplianceHealth';
 import DocumentsCard from '@/components/dashboard/DocumentsCard';
-import { fetchTasks, calculateComplianceHealth, Task } from '@/utils/tasksService';
+import CompanyStatusCard from '@/components/dashboard/CompanyStatusCard';
+import { fetchTasks, calculateComplianceHealth, Task, fetchCompanyInfo, CompanyInfo } from '@/utils/tasksService';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from '@/components/ui/use-toast';
 
@@ -27,9 +28,14 @@ const mockDocuments = [
 ];
 
 const Dashboard = () => {
-  const { data: tasks = [], isLoading, error } = useQuery({
+  const { data: tasks = [], isLoading: isLoadingTasks, error: tasksError } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks
+  });
+
+  const { data: companyInfo, isLoading: isLoadingCompany, error: companyError } = useQuery({
+    queryKey: ['companyInfo'],
+    queryFn: fetchCompanyInfo
   });
 
   const upcomingTasks = tasks.filter(task => 
@@ -41,11 +47,14 @@ const Dashboard = () => {
   const overdueTasksCount = tasks.filter(task => task.status === 'overdue').length;
   const healthMetrics = calculateComplianceHealth(tasks);
 
+  const isLoading = isLoadingTasks || isLoadingCompany;
+  const error = tasksError || companyError;
+
   // Show error toast if tasks fetch fails
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error loading tasks",
+        title: "Error loading data",
         description: "Please try again later or contact support if the issue persists.",
         variant: "destructive"
       });
@@ -68,6 +77,12 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
+            {companyInfo && (
+              <div className="mb-6">
+                <CompanyStatusCard companyInfo={companyInfo} />
+              </div>
+            )}
+            
             <div className="grid gap-6 md:grid-cols-3">
               <StatsCard
                 title="Pending Tasks"
@@ -96,6 +111,7 @@ const Dashboard = () => {
                 score={healthMetrics.score} 
                 tasksCompleted={healthMetrics.completedTasks} 
                 totalTasks={healthMetrics.totalTasks} 
+                nextSteps={healthMetrics.nextSteps}
               />
               
               <div className="lg:col-span-2">
