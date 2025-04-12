@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export type TaskPriority = 'low' | 'medium' | 'high';
@@ -47,7 +48,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
     category: item.category,
     priority: item.priority as TaskPriority,
     status: item.status as TaskStatus,
-    regulatoryReference: (item as any).regulatory_reference
+    regulatoryReference: item.regulatory_reference || undefined
   }));
 };
 
