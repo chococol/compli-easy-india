@@ -47,7 +47,7 @@ export const fetchTasks = async (): Promise<Task[]> => {
     category: item.category,
     priority: item.priority as TaskPriority,
     status: item.status as TaskStatus,
-    regulatoryReference: item.regulatory_reference || undefined
+    regulatoryReference: (item as any).regulatory_reference
   }));
 };
 

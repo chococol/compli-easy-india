@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { Menu, Bell, User, X } from 'lucide-react';
+import { Menu, Bell, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Logo from '../Logo';
 import MobileSidebar from './MobileSidebar';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const isMobile = useIsMobile();
@@ -28,6 +29,7 @@ const Navbar = () => {
         <Logo />
         
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="icon" aria-label="Notifications">
             <Bell className="h-5 w-5" />
           </Button>
