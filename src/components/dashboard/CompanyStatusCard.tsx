@@ -3,7 +3,16 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BuildingIcon, Calendar } from 'lucide-react';
-import { CompanyInfo, RegistrationStatus } from '@/utils/tasksService';
+
+export type RegistrationStatus = 'not-started' | 'in-progress' | 'completed';
+
+export interface CompanyInfo {
+  id: string;
+  name: string;
+  registrationStatus: RegistrationStatus;
+  industry: string;
+  registrationDate?: string;
+}
 
 interface CompanyStatusCardProps {
   companyInfo: CompanyInfo;

@@ -5,7 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileText, ChevronRight, FileCode } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Task, TaskStatus } from '@/utils/tasksService';
+
+export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'overdue';
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  dueDate: string;
+  category: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  regulatoryReference?: string;
+}
 
 interface TasksListProps {
   tasks: Task[];
