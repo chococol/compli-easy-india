@@ -1,16 +1,17 @@
 
 import React from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import Navbar from '@/components/layout/Navbar';
 
 const Pricing = () => {
   const navigate = useNavigate();
 
   return (
-    <MainLayout>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
       <div className="max-w-6xl mx-auto py-12 px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h1>
@@ -122,7 +123,20 @@ const Pricing = () => {
           </Button>
         </div>
       </div>
-    </MainLayout>
+
+      <footer className="mt-auto border-t py-6">
+        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
+          <p className="text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} CompliEasy. All rights reserved.
+          </p>
+          <nav className="flex gap-4 text-sm text-muted-foreground">
+            <Link to="/terms" className="hover:underline">Terms</Link>
+            <Link to="/privacy" className="hover:underline">Privacy</Link>
+            <Link to="/about" className="hover:underline">About</Link>
+          </nav>
+        </div>
+      </footer>
+    </div>
   );
 };
 
