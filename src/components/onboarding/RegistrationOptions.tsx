@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Building, Briefcase, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface RegistrationOption {
   id: string;
@@ -56,9 +58,18 @@ const registrationOptions: RegistrationOption[] = [
 
 const RegistrationOptions = () => {
   const navigate = useNavigate();
+  const { completeRegistration } = useAuth();
+  const { toast } = useToast();
   
   const handleSelectOption = (optionId: string) => {
-    navigate(`/registration/${optionId}`);
+    // In a real app, you would save this option to the user's profile in the database
+    toast({
+      title: "Registration completed!",
+      description: `You selected ${optionId} as your business structure.`,
+    });
+    
+    // Mark registration as complete and redirect to dashboard
+    completeRegistration();
   };
   
   return (
@@ -72,9 +83,9 @@ const RegistrationOptions = () => {
       
       <div className="grid gap-6 md:grid-cols-3">
         {registrationOptions.map((option) => (
-          <Card key={option.id} className={`overflow-hidden ${option.recommended ? 'border-brand-teal' : ''}`}>
+          <Card key={option.id} className={`overflow-hidden ${option.recommended ? 'border-primary' : ''}`}>
             {option.recommended && (
-              <div className="bg-brand-teal text-white text-xs font-medium py-1 text-center">
+              <div className="bg-primary text-primary-foreground text-xs font-medium py-1 text-center">
                 RECOMMENDED
               </div>
             )}

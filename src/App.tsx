@@ -45,22 +45,22 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiresRegistration={true}>
                   <Dashboard />
                 </ProtectedRoute>
               } />
               <Route path="/registration" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiresRegistration={false}>
                   <Registration />
                 </ProtectedRoute>
               } />
               <Route path="/tasks" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiresRegistration={true}>
                   <TasksPage />
                 </ProtectedRoute>
               } />
               <Route path="/documents" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiresRegistration={true}>
                   <DocumentsPage />
                 </ProtectedRoute>
               } />

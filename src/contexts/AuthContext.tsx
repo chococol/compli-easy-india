@@ -8,17 +8,24 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isRegistrationComplete: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  completeRegistration: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// For demo purposes, we're using localStorage to track registration status
+// In a real app, this would be stored in your database
+const REGISTRATION_COMPLETE_KEY = 'registration_complete';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +34,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // When user signs in, check registration status
+        if (session?.user) {
+          const registrationComplete = localStorage.getItem(`${REGISTRATION_COMPLETE_KEY}_${session.user.id}`);
+          setIsRegistrationComplete(registrationComplete === 'true');
+        }
       }
     );
 
@@ -34,6 +47,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Check registration status for current user
+      if (session?.user) {
+        const registrationComplete = localStorage.getItem(`${REGISTRATION_COMPLETE_KEY}_${session.user.id}`);
+        setIsRegistrationComplete(registrationComplete === 'true');
+      }
+      
       setLoading(false);
     });
 
@@ -66,8 +86,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate('/');
   };
 
+  const completeRegistration = () => {
+    if (user) {
+      localStorage.setItem(`${REGISTRATION_COMPLETE_KEY}_${user.id}`, 'true');
+      setIsRegistrationComplete(true);
+      navigate('/dashboard');
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      isRegistrationComplete,
+      signIn, 
+      signUp, 
+      signOut,
+      completeRegistration
+    }}>
       {children}
     </AuthContext.Provider>
   );
