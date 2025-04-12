@@ -1,11 +1,9 @@
-
 import React from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Terms = () => {
   return (
-    <MainLayout>
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto py-12 px-4">
         <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
         
@@ -71,7 +69,7 @@ const Terms = () => {
           </CardContent>
         </Card>
       </div>
-    </MainLayout>
+    </div>
   );
 };
 
