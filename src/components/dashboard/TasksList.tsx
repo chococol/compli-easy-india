@@ -5,16 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileText, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'overdue';
-
-interface Task {
-  id: string;
-  title: string;
-  dueDate: string;
-  status: TaskStatus;
-  description?: string;
-}
+import { Task, TaskStatus } from '@/utils/tasksService';
 
 interface TasksListProps {
   tasks: Task[];

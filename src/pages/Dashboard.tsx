@@ -1,34 +1,16 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, ClipboardList, AlertTriangle } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
 import TasksList from '@/components/dashboard/TasksList';
 import ComplianceHealth from '@/components/dashboard/ComplianceHealth';
 import DocumentsCard from '@/components/dashboard/DocumentsCard';
+import { fetchTasks, calculateComplianceHealth, Task } from '@/utils/tasksService';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from '@/components/ui/use-toast';
 
-// Sample data - in a real app this would come from an API
-const mockTasks = [
-  {
-    id: '1',
-    title: 'Upload PAN Card',
-    dueDate: 'Apr 15, 2025',
-    status: 'pending' as const,
-  },
-  {
-    id: '2',
-    title: 'Review Company Details',
-    dueDate: 'Apr 18, 2025',
-    status: 'in-progress' as const,
-  },
-  {
-    id: '3',
-    title: 'Verify Director Information',
-    dueDate: 'Apr 20, 2025',
-    status: 'pending' as const,
-  },
-];
-
+// Sample documents data - in a real app this would come from an API
 const mockDocuments = [
   {
     id: '1',
@@ -45,6 +27,31 @@ const mockDocuments = [
 ];
 
 const Dashboard = () => {
+  const { data: tasks = [], isLoading, error } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: fetchTasks
+  });
+
+  const upcomingTasks = tasks.filter(task => 
+    task.status === 'pending' || task.status === 'in-progress'
+  ).slice(0, 3);
+  
+  const pendingTasksCount = tasks.filter(task => task.status === 'pending').length;
+  const inProgressTasksCount = tasks.filter(task => task.status === 'in-progress').length;
+  const overdueTasksCount = tasks.filter(task => task.status === 'overdue').length;
+  const healthMetrics = calculateComplianceHealth(tasks);
+
+  // Show error toast if tasks fetch fails
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error loading tasks",
+        description: "Please try again later or contact support if the issue persists.",
+        variant: "destructive"
+      });
+    }
+  }, [error]);
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -55,44 +62,52 @@ const Dashboard = () => {
           </p>
         </header>
         
-        <div className="grid gap-6 md:grid-cols-3">
-          <StatsCard
-            title="Pending Tasks"
-            value="3"
-            icon={<ClipboardList className="h-5 w-5" />}
-            description="2 tasks due this week"
-          />
-          
-          <StatsCard
-            title="Documents Uploaded"
-            value="2/8"
-            icon={<FileText className="h-5 w-5" />}
-            description="6 more documents required"
-          />
-          
-          <StatsCard
-            title="Upcoming Deadlines"
-            value="1"
-            icon={<AlertTriangle className="h-5 w-5" />}
-            description="GST filing due on Apr 20"
-          />
-        </div>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <ComplianceHealth 
-            score={65} 
-            tasksCompleted={5} 
-            totalTasks={12} 
-          />
-          
-          <div className="lg:col-span-2">
-            <TasksList tasks={mockTasks} />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
           </div>
-        </div>
-        
-        <div>
-          <DocumentsCard recentDocuments={mockDocuments} />
-        </div>
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-3">
+              <StatsCard
+                title="Pending Tasks"
+                value={`${pendingTasksCount}`}
+                icon={<ClipboardList className="h-5 w-5" />}
+                description={`${inProgressTasksCount} tasks in progress`}
+              />
+              
+              <StatsCard
+                title="Documents Uploaded"
+                value="2/8"
+                icon={<FileText className="h-5 w-5" />}
+                description="6 more documents required"
+              />
+              
+              <StatsCard
+                title="Overdue Items"
+                value={`${overdueTasksCount}`}
+                icon={<AlertTriangle className="h-5 w-5" />}
+                description={overdueTasksCount > 0 ? "Requires immediate attention" : "Everything is on track"}
+              />
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <ComplianceHealth 
+                score={healthMetrics.score} 
+                tasksCompleted={healthMetrics.completedTasks} 
+                totalTasks={healthMetrics.totalTasks} 
+              />
+              
+              <div className="lg:col-span-2">
+                <TasksList tasks={upcomingTasks} />
+              </div>
+            </div>
+            
+            <div>
+              <DocumentsCard recentDocuments={mockDocuments} />
+            </div>
+          </>
+        )}
       </div>
     </MainLayout>
   );

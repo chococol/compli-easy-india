@@ -9,7 +9,81 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      compliance_deadlines: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          notification_sent: boolean | null
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          notification_sent?: boolean | null
+          priority: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          notification_sent?: boolean | null
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          compliance_updates: boolean | null
+          created_at: string
+          deadline_reminders: boolean | null
+          email_notifications: boolean | null
+          id: string
+          reminder_days_before: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          compliance_updates?: boolean | null
+          created_at?: string
+          deadline_reminders?: boolean | null
+          email_notifications?: boolean | null
+          id?: string
+          reminder_days_before?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          compliance_updates?: boolean | null
+          created_at?: string
+          deadline_reminders?: boolean | null
+          email_notifications?: boolean | null
+          id?: string
+          reminder_days_before?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
