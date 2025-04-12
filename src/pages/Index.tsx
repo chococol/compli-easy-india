@@ -21,7 +21,7 @@ const Index = () => {
             <Button variant="ghost" onClick={() => navigate('/pricing')}>Pricing</Button>
             <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
-            <Button onClick={() => navigate('/registration')}>Get Started</Button>
+            <Button onClick={() => navigate('/auth')}>Get Started</Button>
           </div>
         </div>
       </header>
@@ -36,8 +36,8 @@ const Index = () => {
             An all-in-one platform that streamlines your business registration process and keeps you compliant with all regulatory requirements.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" onClick={() => navigate('/registration')} className="gap-2">
-              Start Registration <ArrowRight className="h-4 w-4" />
+            <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
+              Start Onboarding <ArrowRight className="h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/dashboard')}>
               Explore Dashboard
@@ -151,7 +151,7 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             Join thousands of businesses that trust CompliEasy for their registration and compliance needs.
           </p>
-          <Button size="lg" onClick={() => navigate('/registration')} className="gap-2">
+          <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
             Get Started Today <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
@@ -171,7 +171,7 @@ const Index = () => {
             <div>
               <h4 className="font-semibold mb-3">Product</h4>
               <ul className="space-y-2">
-                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/registration')}>Registration</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/auth')}>Onboarding</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/dashboard')}>Compliance</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/documents')}>Document Management</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/pricing')}>Pricing</Button></li>

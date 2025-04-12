@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,7 @@ const Pricing = () => {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" onClick={() => navigate('/registration')}>
+              <Button className="w-full" onClick={() => navigate('/auth')}>
                 Get Started
               </Button>
             </CardFooter>
@@ -75,7 +74,7 @@ const Pricing = () => {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" onClick={() => navigate('/registration')}>
+              <Button className="w-full" onClick={() => navigate('/auth')}>
                 Get Started
               </Button>
             </CardFooter>
