@@ -1,20 +1,13 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/layout/ThemeToggle';
-import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
