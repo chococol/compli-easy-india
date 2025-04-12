@@ -8,24 +8,24 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  isRegistrationComplete: boolean;
+  isOnboardingComplete: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  completeRegistration: () => void;
+  completeOnboarding: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// For demo purposes, we're using localStorage to track registration status
+// For demo purposes, we're using localStorage to track onboarding status
 // In a real app, this would be stored in your database
-const REGISTRATION_COMPLETE_KEY = 'registration_complete';
+const ONBOARDING_COMPLETE_KEY = 'onboarding_complete';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,10 +35,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // When user signs in, check registration status
+        // When user signs in, check onboarding status
         if (session?.user) {
-          const registrationComplete = localStorage.getItem(`${REGISTRATION_COMPLETE_KEY}_${session.user.id}`);
-          setIsRegistrationComplete(registrationComplete === 'true');
+          const onboardingComplete = localStorage.getItem(`${ONBOARDING_COMPLETE_KEY}_${session.user.id}`);
+          setIsOnboardingComplete(onboardingComplete === 'true');
         }
       }
     );
@@ -48,10 +48,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Check registration status for current user
+      // Check onboarding status for current user
       if (session?.user) {
-        const registrationComplete = localStorage.getItem(`${REGISTRATION_COMPLETE_KEY}_${session.user.id}`);
-        setIsRegistrationComplete(registrationComplete === 'true');
+        const onboardingComplete = localStorage.getItem(`${ONBOARDING_COMPLETE_KEY}_${session.user.id}`);
+        setIsOnboardingComplete(onboardingComplete === 'true');
       }
       
       setLoading(false);
@@ -86,10 +86,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate('/');
   };
 
-  const completeRegistration = () => {
+  const completeOnboarding = () => {
     if (user) {
-      localStorage.setItem(`${REGISTRATION_COMPLETE_KEY}_${user.id}`, 'true');
-      setIsRegistrationComplete(true);
+      localStorage.setItem(`${ONBOARDING_COMPLETE_KEY}_${user.id}`, 'true');
+      setIsOnboardingComplete(true);
       navigate('/dashboard');
     }
   };
@@ -99,11 +99,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user, 
       session, 
       loading, 
-      isRegistrationComplete,
+      isOnboardingComplete,
       signIn, 
       signUp, 
       signOut,
-      completeRegistration
+      completeOnboarding
     }}>
       {children}
     </AuthContext.Provider>

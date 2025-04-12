@@ -5,14 +5,14 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiresRegistration?: boolean;
+  requiresOnboarding?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requiresRegistration = true 
+  requiresOnboarding = true 
 }) => {
-  const { user, loading, isRegistrationComplete } = useAuth();
+  const { user, loading, isOnboardingComplete } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -25,10 +25,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/auth" replace />;
   }
 
-  // If registration is required for this route and user hasn't completed registration
-  // and they're not already on the registration page, redirect to registration
-  if (requiresRegistration && !isRegistrationComplete && location.pathname !== '/registration') {
-    return <Navigate to="/registration" replace />;
+  // If onboarding is required for this route and user hasn't completed onboarding
+  // and they're not already on the onboarding page, redirect to onboarding
+  if (requiresOnboarding && !isOnboardingComplete && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return <>{children}</>;

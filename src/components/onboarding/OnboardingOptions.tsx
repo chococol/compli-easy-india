@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-interface RegistrationOption {
+interface OnboardingOption {
   id: string;
   title: string;
   description: string;
@@ -16,7 +16,7 @@ interface RegistrationOption {
   recommended?: boolean;
 }
 
-const registrationOptions: RegistrationOption[] = [
+const onboardingOptions: OnboardingOption[] = [
   {
     id: 'private-limited',
     title: 'Private Limited Company',
@@ -56,20 +56,20 @@ const registrationOptions: RegistrationOption[] = [
   },
 ];
 
-const RegistrationOptions = () => {
+const OnboardingOptions = () => {
   const navigate = useNavigate();
-  const { completeRegistration } = useAuth();
+  const { completeOnboarding } = useAuth();
   const { toast } = useToast();
   
   const handleSelectOption = (optionId: string) => {
     // In a real app, you would save this option to the user's profile in the database
     toast({
-      title: "Registration completed!",
+      title: "Onboarding completed!",
       description: `You selected ${optionId} as your business structure.`,
     });
     
-    // Mark registration as complete and redirect to dashboard
-    completeRegistration();
+    // Mark onboarding as complete and redirect to dashboard
+    completeOnboarding();
   };
   
   return (
@@ -82,7 +82,7 @@ const RegistrationOptions = () => {
       </div>
       
       <div className="grid gap-6 md:grid-cols-3">
-        {registrationOptions.map((option) => (
+        {onboardingOptions.map((option) => (
           <Card key={option.id} className={`overflow-hidden ${option.recommended ? 'border-primary' : ''}`}>
             {option.recommended && (
               <div className="bg-primary text-primary-foreground text-xs font-medium py-1 text-center">
@@ -128,4 +128,4 @@ const RegistrationOptions = () => {
   );
 };
 
-export default RegistrationOptions;
+export default OnboardingOptions;

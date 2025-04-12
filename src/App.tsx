@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import Registration from "./pages/Registration";
+import Onboarding from "./pages/Onboarding";
 import TasksPage from "./pages/TasksPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import NotFound from "./pages/NotFound";
@@ -45,22 +45,22 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={
-                <ProtectedRoute requiresRegistration={true}>
+                <ProtectedRoute requiresOnboarding={true}>
                   <Dashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/registration" element={
-                <ProtectedRoute requiresRegistration={false}>
-                  <Registration />
+              <Route path="/onboarding" element={
+                <ProtectedRoute requiresOnboarding={false}>
+                  <Onboarding />
                 </ProtectedRoute>
               } />
               <Route path="/tasks" element={
-                <ProtectedRoute requiresRegistration={true}>
+                <ProtectedRoute requiresOnboarding={true}>
                   <TasksPage />
                 </ProtectedRoute>
               } />
               <Route path="/documents" element={
-                <ProtectedRoute requiresRegistration={true}>
+                <ProtectedRoute requiresOnboarding={true}>
                   <DocumentsPage />
                 </ProtectedRoute>
               } />
