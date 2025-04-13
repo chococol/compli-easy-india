@@ -59,7 +59,11 @@ const DocumentsCard: React.FC<DocumentsCardProps> = ({ recentDocuments }) => {
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => navigate(`/documents/${doc.id}`)}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => navigate(`/documents/${doc.id}`)}
+                >
                   <ChevronRight className="h-5 w-5" />
                 </Button>
               </div>

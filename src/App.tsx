@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import TasksPage from "./pages/TasksPage";
 import DocumentsPage from "./pages/DocumentsPage";
+import DocumentUploadPage from "./pages/DocumentUploadPage";
+import DocumentViewPage from "./pages/DocumentViewPage";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Mission from "./pages/Mission";
@@ -63,6 +65,16 @@ const App = () => {
               <Route path="/documents" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <DocumentsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/documents/upload" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <DocumentUploadPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/documents/:id" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <DocumentViewPage />
                 </ProtectedRoute>
               } />
               <Route path="/about" element={<About />} />

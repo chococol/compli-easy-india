@@ -88,6 +88,22 @@ const DocumentsPage = () => {
     if (activeCategory === 'All Documents') return matchesSearch;
     return matchesSearch && doc.category === activeCategory;
   });
+
+  // Handle document view
+  const handleViewDocument = (documentId: string) => {
+    // In a real app, this would open the document in a viewer
+    console.log(`Viewing document with ID: ${documentId}`);
+    // For now we'll just show an alert
+    alert(`Viewing document: ${documents.find(doc => doc.id === documentId)?.name}`);
+  };
+
+  // Handle document download
+  const handleDownloadDocument = (documentId: string) => {
+    // In a real app, this would download the document
+    console.log(`Downloading document with ID: ${documentId}`);
+    // For now we'll just show an alert
+    alert(`Downloading document: ${documents.find(doc => doc.id === documentId)?.name}`);
+  };
   
   return (
     <MainLayout>
@@ -156,7 +172,12 @@ const DocumentsPage = () => {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredDocuments.map((doc) => (
-                    <DocumentCard key={doc.id} document={doc} />
+                    <DocumentCard 
+                      key={doc.id} 
+                      document={doc} 
+                      onView={handleViewDocument}
+                      onDownload={handleDownloadDocument}
+                    />
                   ))}
                 </div>
               )}
@@ -168,7 +189,11 @@ const DocumentsPage = () => {
   );
 };
 
-const DocumentCard: React.FC<{ document: Document }> = ({ document }) => {
+const DocumentCard: React.FC<{ 
+  document: Document,
+  onView: (id: string) => void,
+  onDownload: (id: string) => void
+}> = ({ document, onView, onDownload }) => {
   return (
     <Card className="overflow-hidden">
       <div className="bg-muted p-4 flex items-center justify-center border-b h-40">
@@ -191,11 +216,11 @@ const DocumentCard: React.FC<{ document: Document }> = ({ document }) => {
           {document.uploadedBy && ` by ${document.uploadedBy}`}
         </p>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" className="w-full">
+          <Button size="sm" variant="outline" className="w-full" onClick={() => onView(document.id)}>
             <Eye className="h-4 w-4 mr-1" />
             View
           </Button>
-          <Button size="sm" variant="outline" className="w-full">
+          <Button size="sm" variant="outline" className="w-full" onClick={() => onDownload(document.id)}>
             <Download className="h-4 w-4 mr-1" />
             Download
           </Button>
