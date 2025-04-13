@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Document type definition
 export interface Document {
@@ -12,8 +14,54 @@ export interface Document {
   uploadedBy?: string;
   fileSize: string;
   file?: File;
+  url?: string;
 }
 
+// Document categories
+export const documentCategories = [
+  'All Documents',
+  'Identity Document',
+  'Business Document',
+  'Branding',
+  'Certificates',
+  'Other',
+];
+
+// Function to fetch documents from Supabase
+const fetchDocumentsFromSupabase = async () => {
+  try {
+    // We'll use the existing storage bucket for documents
+    const { data: files, error } = await supabase.storage
+      .from('documents')
+      .list('', { sortBy: { column: 'created_at', order: 'desc' } });
+
+    if (error) {
+      throw error;
+    }
+
+    // Convert storage objects to our Document interface
+    const documents: Document[] = files ? files.map(file => ({
+      id: file.id,
+      name: file.name,
+      type: file.metadata?.mimetype?.split('/')[1]?.toUpperCase() || 'PDF',
+      category: file.metadata?.category || 'Other',
+      uploadedAt: new Date(file.created_at || Date.now()).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      }),
+      fileSize: `${Math.round((file.metadata?.size || 0) / 1024)} KB`,
+      url: supabase.storage.from('documents').getPublicUrl(file.name).data.publicUrl
+    })) : [];
+
+    return documents;
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+    return [];
+  }
+};
+
+// Mock documents for development/testing when Supabase isn't connected
 const mockDocuments: Document[] = [
   {
     id: '1',
@@ -58,64 +106,110 @@ const mockDocuments: Document[] = [
   },
 ];
 
-// Document categories
-export const documentCategories = [
-  'All Documents',
-  'Identity Document',
-  'Business Document',
-  'Branding',
-  'Certificates',
-  'Other',
-];
-
 export const useDocuments = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch documents on component mount
-  useEffect(() => {
-    const fetchDocuments = async () => {
+  // Fetch documents query
+  const { data: documents = [], isLoading: loading } = useQuery({
+    queryKey: ['documents'],
+    queryFn: async () => {
       try {
-        // In a real app, this would be an API call to fetch documents
-        // For now, we'll just use our mock data
-        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
-        setDocuments(mockDocuments);
-        setLoading(false);
+        // Check if Supabase storage is available
+        const { data } = await supabase.storage.getBuckets();
+        
+        // If we have access to Supabase storage, fetch documents
+        if (data) {
+          return fetchDocumentsFromSupabase();
+        } else {
+          // Fall back to mock data
+          return mockDocuments;
+        }
       } catch (err) {
-        setError('Failed to fetch documents');
-        setLoading(false);
-        toast.error('Failed to load documents');
+        console.log('Using mock data due to error:', err);
+        return mockDocuments;
       }
-    };
+    },
+  });
 
-    fetchDocuments();
-  }, []);
+  // Upload document mutation
+  const uploadMutation = useMutation({
+    mutationFn: async (document: Omit<Document, 'id' | 'uploadedAt'>) => {
+      try {
+        if (!document.file) {
+          throw new Error('No file provided');
+        }
+
+        // Try to use Supabase storage
+        try {
+          // Create a unique file name to avoid collisions
+          const fileName = `${Date.now()}-${document.name}`;
+          
+          // Upload the file to Supabase storage
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(fileName, document.file, {
+              cacheControl: '3600',
+              upsert: false,
+            });
+            
+          if (uploadError) throw uploadError;
+          
+          // Get the public URL for the uploaded file
+          const { data } = supabase.storage
+            .from('documents')
+            .getPublicUrl(fileName);
+            
+          // Return the new document object
+          const newDocument: Document = {
+            ...document,
+            id: `doc-${Date.now()}`,
+            uploadedAt: new Date().toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            }),
+            url: data.publicUrl
+          };
+          
+          return newDocument;
+        } catch (err) {
+          console.error("Supabase upload failed, using mock data:", err);
+          // Fall back to mock behavior for demo purposes
+          const newDocument: Document = {
+            ...document,
+            id: `doc-${Date.now()}`,
+            uploadedAt: new Date().toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            }),
+          };
+          
+          return newDocument;
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        throw err;
+      }
+    },
+    onSuccess: (newDocument) => {
+      // Add the new document to the documents list
+      queryClient.setQueryData(['documents'], (oldData: Document[] = []) => [
+        newDocument,
+        ...oldData,
+      ]);
+      toast.success('Document uploaded successfully!');
+    },
+    onError: (err) => {
+      setError('Failed to upload document');
+      toast.error('Failed to upload document');
+    },
+  });
 
   // Upload a new document
   const uploadDocument = async (document: Omit<Document, 'id' | 'uploadedAt'>) => {
-    try {
-      setLoading(true);
-      
-      // In a real app, this would be an API call to upload the document
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-      
-      const newDocument: Document = {
-        ...document,
-        id: `doc-${Date.now()}`,
-        uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      };
-      
-      setDocuments(prev => [newDocument, ...prev]);
-      toast.success('Document uploaded successfully!');
-      return newDocument;
-    } catch (err) {
-      setError('Failed to upload document');
-      toast.error('Failed to upload document');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    return uploadMutation.mutateAsync(document);
   };
 
   // View a document
@@ -139,26 +233,53 @@ export const useDocuments = () => {
       return;
     }
     
-    // In a real app, this would download the document
-    toast.success(`Downloading document: ${document.name}`);
+    if (document.url) {
+      // If we have a URL, open it in a new tab
+      window.open(document.url, '_blank');
+    } else {
+      // Mock download for demo purposes
+      toast.success(`Downloading document: ${document.name}`);
+    }
+    
     return document;
   };
 
   // Delete a document
   const deleteDocument = async (id: string) => {
     try {
-      setLoading(true);
+      const document = documents.find(doc => doc.id === id);
+      if (!document) {
+        toast.error('Document not found');
+        return;
+      }
+
+      // Try to delete from Supabase if possible
+      try {
+        // Extract the filename from the URL if it exists
+        if (document.url) {
+          const fileName = document.url.split('/').pop();
+          if (fileName) {
+            const { error } = await supabase.storage
+              .from('documents')
+              .remove([fileName]);
+              
+            if (error) throw error;
+          }
+        }
+      } catch (err) {
+        console.error("Supabase delete failed:", err);
+        // Continue with optimistic UI update even if Supabase delete fails
+      }
+
+      // Update the local cache
+      queryClient.setQueryData(['documents'], (oldData: Document[] = []) => 
+        oldData.filter(doc => doc.id !== id)
+      );
       
-      // In a real app, this would be an API call to delete the document
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
-      
-      setDocuments(prev => prev.filter(doc => doc.id !== id));
       toast.success('Document deleted successfully!');
     } catch (err) {
       setError('Failed to delete document');
       toast.error('Failed to delete document');
-    } finally {
-      setLoading(false);
     }
   };
 

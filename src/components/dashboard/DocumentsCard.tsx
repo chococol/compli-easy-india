@@ -4,20 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Upload, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface Document {
-  id: string;
-  name: string;
-  type: string;
-  uploadedAt: string;
-}
+import { useDocuments, Document } from '@/hooks/useDocuments';
 
 interface DocumentsCardProps {
-  recentDocuments: Document[];
+  recentDocuments?: Document[];
 }
 
 const DocumentsCard: React.FC<DocumentsCardProps> = ({ recentDocuments }) => {
   const navigate = useNavigate();
+  const { getRecentDocuments } = useDocuments();
+  
+  // If recentDocuments are not provided, use the hook to get them
+  const documents = recentDocuments || getRecentDocuments(3);
   
   return (
     <Card className="dashboard-card">
@@ -35,7 +33,7 @@ const DocumentsCard: React.FC<DocumentsCardProps> = ({ recentDocuments }) => {
       </CardHeader>
       <CardContent className="px-0">
         <div className="space-y-4">
-          {recentDocuments.length === 0 ? (
+          {documents.length === 0 ? (
             <div className="text-center py-6 text-muted-foreground">
               <FileText className="mx-auto h-10 w-10 opacity-25 mb-3" />
               <p>No documents yet</p>
@@ -48,14 +46,14 @@ const DocumentsCard: React.FC<DocumentsCardProps> = ({ recentDocuments }) => {
               </Button>
             </div>
           ) : (
-            recentDocuments.map((doc) => (
+            documents.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between px-6 py-3 hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <div className="font-medium">{doc.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {doc.type} • Uploaded {doc.uploadedAt}
+                      {doc.category} • Uploaded {doc.uploadedAt}
                     </div>
                   </div>
                 </div>
