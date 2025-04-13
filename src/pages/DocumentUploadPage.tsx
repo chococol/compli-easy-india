@@ -30,6 +30,11 @@ const DocumentUploadPage = () => {
   const { uploadDocument } = useDocuments();
   const { user } = useAuth();
   
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,6 +76,7 @@ const DocumentUploadPage = () => {
         userId: user.id
       });
 
+      toast.success('Document uploaded successfully!');
       navigate('/documents');
     } catch (error) {
       console.error('Upload error:', error);
