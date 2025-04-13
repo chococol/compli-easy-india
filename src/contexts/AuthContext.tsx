@@ -12,14 +12,10 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  completeOnboarding: () => void;
+  completeOnboarding: (businessStructure: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// For demo purposes, we're using localStorage to track onboarding status
-// In a real app, this would be stored in your database
-const ONBOARDING_COMPLETE_KEY = 'onboarding_complete';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -27,6 +23,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const navigate = useNavigate();
+
+  // Function to check if user has completed onboarding
+  const checkOnboardingStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_onboarding')
+        .select('is_complete')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching onboarding status:', error);
+        setIsOnboardingComplete(false);
+        return;
+      }
+      
+      setIsOnboardingComplete(data?.is_complete || false);
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setIsOnboardingComplete(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -37,8 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // When user signs in, check onboarding status
         if (session?.user) {
-          const onboardingComplete = localStorage.getItem(`${ONBOARDING_COMPLETE_KEY}_${session.user.id}`);
-          setIsOnboardingComplete(onboardingComplete === 'true');
+          checkOnboardingStatus(session.user.id);
         }
       }
     );
@@ -50,8 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Check onboarding status for current user
       if (session?.user) {
-        const onboardingComplete = localStorage.getItem(`${ONBOARDING_COMPLETE_KEY}_${session.user.id}`);
-        setIsOnboardingComplete(onboardingComplete === 'true');
+        checkOnboardingStatus(session.user.id);
       }
       
       setLoading(false);
@@ -64,7 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (!error) {
-        navigate('/dashboard');
+        // After successful login, we'll let the router decide where to go based on onboarding status
+        // which will be checked in the auth state change handler
       }
       return { error };
     } catch (error) {
@@ -75,6 +92,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signUp({ email, password });
+      if (!error) {
+        // New users will be directed to onboarding by the ProtectedRoute component
+      }
       return { error };
     } catch (error) {
       return { error };
@@ -86,11 +106,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate('/');
   };
 
-  const completeOnboarding = () => {
+  const completeOnboarding = async (businessStructure: string) => {
     if (user) {
-      localStorage.setItem(`${ONBOARDING_COMPLETE_KEY}_${user.id}`, 'true');
-      setIsOnboardingComplete(true);
-      navigate('/dashboard');
+      try {
+        const { error } = await supabase
+          .from('user_onboarding')
+          .upsert({ 
+            user_id: user.id,
+            business_structure: businessStructure,
+            is_complete: true
+          });
+
+        if (error) {
+          console.error('Error saving onboarding data:', error);
+          return;
+        }
+
+        setIsOnboardingComplete(true);
+        navigate('/dashboard');
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+      }
     }
   };
 

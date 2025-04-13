@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building, Briefcase, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -57,19 +56,26 @@ const onboardingOptions: OnboardingOption[] = [
 ];
 
 const OnboardingOptions = () => {
-  const navigate = useNavigate();
   const { completeOnboarding } = useAuth();
   const { toast } = useToast();
   
-  const handleSelectOption = (optionId: string) => {
-    // In a real app, you would save this option to the user's profile in the database
-    toast({
-      title: "Onboarding completed!",
-      description: `You selected ${optionId} as your business structure.`,
-    });
-    
-    // Mark onboarding as complete and redirect to dashboard
-    completeOnboarding();
+  const handleSelectOption = async (optionId: string) => {
+    try {
+      // Save the business structure selection to the database
+      await completeOnboarding(optionId);
+      
+      toast({
+        title: "Onboarding completed!",
+        description: `You selected ${optionId} as your business structure.`,
+      });
+    } catch (error) {
+      console.error('Error during onboarding:', error);
+      toast({
+        title: "Error during onboarding",
+        description: "Failed to save your business structure selection.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
