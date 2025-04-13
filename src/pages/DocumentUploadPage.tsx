@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,15 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-// Document categories for the form
-const documentCategories = [
-  'Identity Document',
-  'Business Document',
-  'Branding',
-  'Certificates',
-  'Other',
-];
+import { useDocuments, documentCategories } from '@/hooks/useDocuments';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Form validation schema
 const formSchema = z.object({
@@ -35,6 +27,8 @@ const DocumentUploadPage = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const { uploadDocument } = useDocuments();
+  const { user } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -61,23 +55,22 @@ const DocumentUploadPage = () => {
     setIsUploading(true);
     
     try {
-      // In a real implementation, we would upload the file to a service like Supabase Storage
-      // For this demo, we'll simulate a successful upload after a delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate adding the document to our list
-      const newDocument = {
-        id: `doc-${Date.now()}`,
+      if (!user) {
+        toast.error('You must be logged in to upload documents');
+        navigate('/auth');
+        return;
+      }
+
+      await uploadDocument({
         name: data.documentName,
         type: selectedFile?.type.split('/')[1].toUpperCase() || 'PDF',
         category: data.documentCategory,
-        uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         fileSize: `${Math.round((selectedFile?.size || 0) / 1024)} KB`,
-      };
-      
-      // In a real app, we would save this document to a database
-      // For now, just show success message
-      toast.success('Document uploaded successfully!');
+        file: selectedFile!,
+        uploadedBy: user.email,
+        userId: user.id
+      });
+
       navigate('/documents');
     } catch (error) {
       console.error('Upload error:', error);

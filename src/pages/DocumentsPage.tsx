@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,76 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Upload, FileText, Download, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-// Document types
-interface Document {
-  id: string;
-  name: string;
-  type: string;
-  category: string;
-  uploadedAt: string;
-  uploadedBy?: string;
-  fileSize: string;
-}
-
-// Sample documents data
-const mockDocuments: Document[] = [
-  {
-    id: '1',
-    name: 'PAN Card.pdf',
-    type: 'PDF',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 10, 2025',
-    fileSize: '1.2 MB',
-  },
-  {
-    id: '2',
-    name: 'Address Proof.pdf',
-    type: 'PDF',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 8, 2025',
-    fileSize: '2.4 MB',
-  },
-  {
-    id: '3',
-    name: 'Company Logo.png',
-    type: 'PNG',
-    category: 'Branding',
-    uploadedAt: 'Apr 5, 2025',
-    fileSize: '0.8 MB',
-  },
-  {
-    id: '4',
-    name: 'Director ID Proof.jpg',
-    type: 'JPG',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 3, 2025',
-    uploadedBy: 'Rajesh K.',
-    fileSize: '1.5 MB',
-  },
-  {
-    id: '5',
-    name: 'Business Plan.docx',
-    type: 'DOCX',
-    category: 'Business Document',
-    uploadedAt: 'Mar 30, 2025',
-    fileSize: '3.1 MB',
-  },
-];
-
-// Document categories for filtering
-const documentCategories = [
-  'All Documents',
-  'Identity Document',
-  'Business Document',
-  'Branding',
-  'Certificates',
-];
+import { useDocuments, documentCategories, Document } from '@/hooks/useDocuments';
 
 const DocumentsPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [documents, setDocuments] = useState(mockDocuments);
+  const { documents, loading, downloadDocument, viewDocument } = useDocuments();
   const [activeCategory, setActiveCategory] = useState('All Documents');
   
   // Filter documents based on search query and active category
@@ -91,18 +26,12 @@ const DocumentsPage = () => {
 
   // Handle document view
   const handleViewDocument = (documentId: string) => {
-    // In a real app, this would open the document in a viewer
-    console.log(`Viewing document with ID: ${documentId}`);
-    // For now we'll just show an alert
-    alert(`Viewing document: ${documents.find(doc => doc.id === documentId)?.name}`);
+    navigate(`/documents/${documentId}`);
   };
 
   // Handle document download
   const handleDownloadDocument = (documentId: string) => {
-    // In a real app, this would download the document
-    console.log(`Downloading document with ID: ${documentId}`);
-    // For now we'll just show an alert
-    alert(`Downloading document: ${documents.find(doc => doc.id === documentId)?.name}`);
+    downloadDocument(documentId);
   };
   
   return (
@@ -140,50 +69,56 @@ const DocumentsPage = () => {
           </div>
         </div>
         
-        <Tabs 
-          defaultValue="All Documents" 
-          onValueChange={setActiveCategory}
-          className="space-y-4"
-        >
-          <TabsList className="flex flex-wrap">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <p>Loading documents...</p>
+          </div>
+        ) : (
+          <Tabs 
+            defaultValue="All Documents" 
+            onValueChange={setActiveCategory}
+            className="space-y-4"
+          >
+            <TabsList className="flex flex-wrap">
+              {documentCategories.map((category) => (
+                <TabsTrigger key={category} value={category}>
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
             {documentCategories.map((category) => (
-              <TabsTrigger key={category} value={category}>
-                {category}
-              </TabsTrigger>
+              <TabsContent key={category} value={category} className="space-y-4">
+                {filteredDocuments.length === 0 ? (
+                  <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <FileText className="h-12 w-12 text-muted-foreground opacity-25 mb-4" />
+                      <h3 className="text-lg font-medium mb-1">No documents found</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Try adjusting your search or upload new documents
+                      </p>
+                      <Button className="mt-4" onClick={() => navigate('/documents/upload')}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Document
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredDocuments.map((doc) => (
+                      <DocumentCard 
+                        key={doc.id} 
+                        document={doc} 
+                        onView={handleViewDocument}
+                        onDownload={handleDownloadDocument}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
             ))}
-          </TabsList>
-          
-          {documentCategories.map((category) => (
-            <TabsContent key={category} value={category} className="space-y-4">
-              {filteredDocuments.length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-12">
-                    <FileText className="h-12 w-12 text-muted-foreground opacity-25 mb-4" />
-                    <h3 className="text-lg font-medium mb-1">No documents found</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Try adjusting your search or upload new documents
-                    </p>
-                    <Button className="mt-4" onClick={() => navigate('/documents/upload')}>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Document
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredDocuments.map((doc) => (
-                    <DocumentCard 
-                      key={doc.id} 
-                      document={doc} 
-                      onView={handleViewDocument}
-                      onDownload={handleDownloadDocument}
-                    />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+          </Tabs>
+        )}
       </div>
     </MainLayout>
   );

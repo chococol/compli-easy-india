@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Document type definition
 export interface Document {
@@ -15,6 +15,7 @@ export interface Document {
   fileSize: string;
   file?: File;
   url?: string;
+  userId?: string; // Add userId to track document ownership
 }
 
 // Document categories
@@ -27,94 +28,108 @@ export const documentCategories = [
   'Other',
 ];
 
-// Function to fetch documents from Supabase
-const fetchDocumentsFromSupabase = async () => {
-  try {
-    // We'll use the existing storage bucket for documents
-    const { data: files, error } = await supabase.storage
-      .from('documents')
-      .list('', { sortBy: { column: 'created_at', order: 'desc' } });
-
-    if (error) {
-      throw error;
-    }
-
-    // Convert storage objects to our Document interface
-    const documents: Document[] = files ? files.map(file => ({
-      id: file.id,
-      name: file.name,
-      type: file.metadata?.mimetype?.split('/')[1]?.toUpperCase() || 'PDF',
-      category: file.metadata?.category || 'Other',
-      uploadedAt: new Date(file.created_at || Date.now()).toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        year: 'numeric' 
-      }),
-      fileSize: `${Math.round((file.metadata?.size || 0) / 1024)} KB`,
-      url: supabase.storage.from('documents').getPublicUrl(file.name).data.publicUrl
-    })) : [];
-
-    return documents;
-  } catch (error) {
-    console.error('Error fetching documents:', error);
-    return [];
-  }
-};
-
-// Mock documents for development/testing when Supabase isn't connected
-const mockDocuments: Document[] = [
-  {
-    id: '1',
-    name: 'PAN Card.pdf',
-    type: 'PDF',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 10, 2025',
-    fileSize: '1.2 MB',
-  },
-  {
-    id: '2',
-    name: 'Address Proof.pdf',
-    type: 'PDF',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 8, 2025',
-    fileSize: '2.4 MB',
-  },
-  {
-    id: '3',
-    name: 'Company Logo.png',
-    type: 'PNG',
-    category: 'Branding',
-    uploadedAt: 'Apr 5, 2025',
-    fileSize: '0.8 MB',
-  },
-  {
-    id: '4',
-    name: 'Director ID Proof.jpg',
-    type: 'JPG',
-    category: 'Identity Document',
-    uploadedAt: 'Apr 3, 2025',
-    uploadedBy: 'Rajesh K.',
-    fileSize: '1.5 MB',
-  },
-  {
-    id: '5',
-    name: 'Business Plan.docx',
-    type: 'DOCX',
-    category: 'Business Document',
-    uploadedAt: 'Mar 30, 2025',
-    fileSize: '3.1 MB',
-  },
-];
-
 export const useDocuments = () => {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth(); // Get the current user from auth context
+
+  // Function to fetch documents from Supabase
+  const fetchDocumentsFromSupabase = async () => {
+    try {
+      if (!user) {
+        return [];
+      }
+
+      // Create a folder for the user's documents
+      const userFolder = `user_${user.id}`;
+      
+      // We'll use the existing storage bucket for documents
+      const { data: files, error } = await supabase.storage
+        .from('documents')
+        .list(userFolder, { sortBy: { column: 'created_at', order: 'desc' } });
+
+      if (error) {
+        throw error;
+      }
+
+      // Convert storage objects to our Document interface
+      const documents: Document[] = files ? files.map(file => ({
+        id: file.id,
+        name: file.name,
+        type: file.metadata?.mimetype?.split('/')[1]?.toUpperCase() || 'PDF',
+        category: file.metadata?.category || 'Other',
+        uploadedAt: new Date(file.created_at || Date.now()).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        }),
+        fileSize: `${Math.round((file.metadata?.size || 0) / 1024)} KB`,
+        url: supabase.storage.from('documents').getPublicUrl(`${userFolder}/${file.name}`).data.publicUrl,
+        userId: user.id
+      })) : [];
+
+      return documents;
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+      return [];
+    }
+  };
+
+  // Mock documents for development/testing when Supabase isn't connected
+  const mockDocuments: Document[] = [
+    {
+      id: '1',
+      name: 'PAN Card.pdf',
+      type: 'PDF',
+      category: 'Identity Document',
+      uploadedAt: 'Apr 10, 2025',
+      fileSize: '1.2 MB',
+    },
+    {
+      id: '2',
+      name: 'Address Proof.pdf',
+      type: 'PDF',
+      category: 'Identity Document',
+      uploadedAt: 'Apr 8, 2025',
+      fileSize: '2.4 MB',
+    },
+    {
+      id: '3',
+      name: 'Company Logo.png',
+      type: 'PNG',
+      category: 'Branding',
+      uploadedAt: 'Apr 5, 2025',
+      fileSize: '0.8 MB',
+    },
+    {
+      id: '4',
+      name: 'Director ID Proof.jpg',
+      type: 'JPG',
+      category: 'Identity Document',
+      uploadedAt: 'Apr 3, 2025',
+      uploadedBy: 'Rajesh K.',
+      fileSize: '1.5 MB',
+    },
+    {
+      id: '5',
+      name: 'Business Plan.docx',
+      type: 'DOCX',
+      category: 'Business Document',
+      uploadedAt: 'Mar 30, 2025',
+      fileSize: '3.1 MB',
+    },
+  ];
 
   // Fetch documents query
   const { data: documents = [], isLoading: loading } = useQuery({
-    queryKey: ['documents'],
+    queryKey: ['documents', user?.id],  // Add user ID to query key for proper caching
     queryFn: async () => {
       try {
+        // Skip if no user is logged in
+        if (!user) {
+          return [];
+        }
+
         // Check if Supabase storage is available by trying to list buckets
         try {
           // First, check if the documents bucket exists
@@ -133,6 +148,11 @@ export const useDocuments = () => {
             }
           }
           
+          // Create a folder for the user if needed
+          const userFolder = `user_${user.id}`;
+          
+          // Check if user folder exists, if not it will be created on first upload
+          
           // If we made it here, the bucket exists or was created, so fetch documents
           return fetchDocumentsFromSupabase();
         } catch (err) {
@@ -144,25 +164,30 @@ export const useDocuments = () => {
         return mockDocuments;
       }
     },
+    enabled: !!user, // Only run the query if a user is logged in
   });
 
   // Upload document mutation
   const uploadMutation = useMutation({
     mutationFn: async (document: Omit<Document, 'id' | 'uploadedAt'>) => {
       try {
-        if (!document.file) {
-          throw new Error('No file provided');
+        if (!document.file || !user) {
+          throw new Error('No file provided or user not logged in');
         }
 
         // Try to use Supabase storage
         try {
+          // Create a folder for the user's documents
+          const userFolder = `user_${user.id}`;
+          
           // Create a unique file name to avoid collisions
           const fileName = `${Date.now()}-${document.name}`;
+          const filePath = `${userFolder}/${fileName}`;
           
           // Upload the file to Supabase storage
           const { error: uploadError } = await supabase.storage
             .from('documents')
-            .upload(fileName, document.file, {
+            .upload(filePath, document.file, {
               cacheControl: '3600',
               upsert: false,
             });
@@ -172,7 +197,7 @@ export const useDocuments = () => {
           // Get the public URL for the uploaded file
           const { data } = supabase.storage
             .from('documents')
-            .getPublicUrl(fileName);
+            .getPublicUrl(filePath);
             
           // Return the new document object
           const newDocument: Document = {
@@ -183,7 +208,8 @@ export const useDocuments = () => {
               day: 'numeric', 
               year: 'numeric' 
             }),
-            url: data.publicUrl
+            url: data.publicUrl,
+            userId: user.id
           };
           
           return newDocument;
@@ -198,6 +224,7 @@ export const useDocuments = () => {
               day: 'numeric', 
               year: 'numeric' 
             }),
+            userId: user?.id
           };
           
           return newDocument;
@@ -209,7 +236,7 @@ export const useDocuments = () => {
     },
     onSuccess: (newDocument) => {
       // Add the new document to the documents list
-      queryClient.setQueryData(['documents'], (oldData: Document[] = []) => [
+      queryClient.setQueryData(['documents', user?.id], (oldData: Document[] = []) => [
         newDocument,
         ...oldData,
       ]);
@@ -270,15 +297,17 @@ export const useDocuments = () => {
       // Try to delete from Supabase if possible
       try {
         // Extract the filename from the URL if it exists
-        if (document.url) {
-          const fileName = document.url.split('/').pop();
-          if (fileName) {
-            const { error } = await supabase.storage
-              .from('documents')
-              .remove([fileName]);
+        if (document.url && user) {
+          const userFolder = `user_${user.id}`;
+          const urlParts = document.url.split('/');
+          const fileName = urlParts[urlParts.length - 1];
+          const filePath = `${userFolder}/${fileName}`;
+          
+          const { error } = await supabase.storage
+            .from('documents')
+            .remove([filePath]);
               
-            if (error) throw error;
-          }
+          if (error) throw error;
         }
       } catch (err) {
         console.error("Supabase delete failed:", err);
@@ -286,7 +315,7 @@ export const useDocuments = () => {
       }
 
       // Update the local cache
-      queryClient.setQueryData(['documents'], (oldData: Document[] = []) => 
+      queryClient.setQueryData(['documents', user?.id], (oldData: Document[] = []) => 
         oldData.filter(doc => doc.id !== id)
       );
       
