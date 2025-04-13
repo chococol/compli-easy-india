@@ -115,14 +115,28 @@ export const useDocuments = () => {
     queryKey: ['documents'],
     queryFn: async () => {
       try {
-        // Check if Supabase storage is available
-        const { data } = await supabase.storage.getBuckets();
-        
-        // If we have access to Supabase storage, fetch documents
-        if (data) {
+        // Check if Supabase storage is available by trying to list buckets
+        try {
+          // First, check if the documents bucket exists
+          const { data, error } = await supabase.storage.getBucket('documents');
+          
+          if (error) {
+            // If there's an error, try to create the bucket
+            const { error: createError } = await supabase.storage.createBucket('documents', {
+              public: true
+            });
+            
+            // If we can't create it either, use mock data
+            if (createError) {
+              console.log('Cannot create bucket, using mock data:', createError);
+              return mockDocuments;
+            }
+          }
+          
+          // If we made it here, the bucket exists or was created, so fetch documents
           return fetchDocumentsFromSupabase();
-        } else {
-          // Fall back to mock data
+        } catch (err) {
+          console.log('Error accessing Supabase storage, using mock data:', err);
           return mockDocuments;
         }
       } catch (err) {

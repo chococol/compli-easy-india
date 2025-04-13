@@ -4,20 +4,25 @@ import MainLayout from '@/components/layout/MainLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
 import DocumentsCard from '@/components/dashboard/DocumentsCard';
 import { FileText, ClipboardList, AlertTriangle } from 'lucide-react';
+import { Document } from '@/hooks/useDocuments';
 
-// Sample documents data - in a real app this would come from an API
-const mockDocuments = [
+// Sample documents data with all required properties for Document type
+const mockDocuments: Document[] = [
   {
     id: '1',
     name: 'PAN Card.pdf',
-    type: 'Identity Document',
+    type: 'PDF',
+    category: 'Identity Document',
     uploadedAt: 'Apr 10, 2025',
+    fileSize: '1.2 MB',
   },
   {
     id: '2',
     name: 'Address Proof.pdf',
-    type: 'Identity Document',
+    type: 'PDF',
+    category: 'Identity Document',
     uploadedAt: 'Apr 8, 2025',
+    fileSize: '2.4 MB',
   },
 ];
 
