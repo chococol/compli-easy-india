@@ -21,7 +21,7 @@ const formSchema = z.object({
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('signIn');
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, isOnboardingComplete } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -50,7 +50,12 @@ const Auth = () => {
             title: "Welcome back!",
             description: "You have successfully signed in.",
           });
-          navigate('/dashboard');
+          // Redirect based on onboarding status
+          if (isOnboardingComplete) {
+            navigate('/dashboard');
+          } else {
+            navigate('/onboarding');
+          }
         }
       } else {
         const { error } = await signUp(email, password);
@@ -65,7 +70,8 @@ const Auth = () => {
             title: "Account created!",
             description: "Please check your email to confirm your account.",
           });
-          setMode('signIn');
+          // New users always go to onboarding
+          navigate('/onboarding');
         }
       }
     } catch (error: any) {

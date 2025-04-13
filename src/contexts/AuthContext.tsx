@@ -79,10 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (!error) {
-        // After successful login, we'll let the router decide where to go based on onboarding status
-        // which will be checked in the auth state change handler
-      }
       return { error };
     } catch (error) {
       return { error };
@@ -92,9 +88,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signUp({ email, password });
-      if (!error) {
-        // New users will be directed to onboarding by the ProtectedRoute component
-      }
       return { error };
     } catch (error) {
       return { error };
@@ -109,17 +102,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const completeOnboarding = async (businessStructure: string) => {
     if (user) {
       try {
-        const { error } = await supabase
+        // First check if onboarding data already exists
+        const { data: existingData } = await supabase
           .from('user_onboarding')
-          .upsert({ 
-            user_id: user.id,
-            business_structure: businessStructure,
-            is_complete: true
-          });
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-        if (error) {
-          console.error('Error saving onboarding data:', error);
-          return;
+        if (existingData) {
+          // Update existing record
+          const { error } = await supabase
+            .from('user_onboarding')
+            .update({ 
+              business_structure: businessStructure,
+              is_complete: true
+            })
+            .eq('user_id', user.id);
+
+          if (error) {
+            console.error('Error updating onboarding data:', error);
+            return;
+          }
+        } else {
+          // Insert new record
+          const { error } = await supabase
+            .from('user_onboarding')
+            .insert({ 
+              user_id: user.id,
+              business_structure: businessStructure,
+              is_complete: true
+            });
+
+          if (error) {
+            console.error('Error saving onboarding data:', error);
+            return;
+          }
         }
 
         setIsOnboardingComplete(true);
