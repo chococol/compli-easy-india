@@ -1,0 +1,5 @@
+
+project_id = "veuogkgxdjwwosynmfzu"
+
+[functions.deadline-reminders]
+verify_jwt = true
