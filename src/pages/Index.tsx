@@ -1,6 +1,7 @@
+
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle } from 'lucide-react';
+import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle, Landmark, TrendingUp, GanttChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/layout/ThemeToggle';
@@ -24,6 +25,7 @@ const Index = () => {
           <Logo />
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
+            <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
             <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
             <Button variant="ghost" onClick={() => navigate('/pricing')}>Pricing</Button>
             <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
@@ -37,29 +39,29 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-            Simplify Company Registration & Compliance in India
+            Revolutionizing Ease of Doing Business in India
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            An all-in-one platform that streamlines your business registration process and keeps you compliant with all regulatory requirements.
+            Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
-              Start Onboarding <ArrowRight className="h-4 w-4" />
+              Start Your Business Journey <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/dashboard')}>
-              Explore Dashboard
+            <Button size="lg" variant="outline" onClick={() => navigate('/mission')}>
+              Learn About Our Mission
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* India Business Features Section */}
       <section className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Everything You Need in One Place</h2>
+            <h2 className="text-3xl font-bold mb-4">Transforming Business in India</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              CompliEasy provides all the tools you need to register and manage your company's compliance requirements.
+              CompliEasy is dedicated to improving India's business environment through innovative solutions that address key challenges faced by entrepreneurs.
             </p>
           </div>
           
@@ -68,30 +70,64 @@ const Index = () => {
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                 <Building className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Easy Registration</h3>
+              <h3 className="text-xl font-semibold mb-2">Rapid Business Registration</h3>
               <p className="text-muted-foreground">
-                Register your business in just a few steps with guided workflows for various entity types.
+                Register your company in days, not months. We streamline the process across all Indian regulatory bodies.
               </p>
             </div>
             
             <div className="bg-card p-6 rounded-lg shadow-sm">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <Calendar className="h-6 w-6" />
+                <GanttChart className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Compliance Calendar</h3>
+              <h3 className="text-xl font-semibold mb-2">Simplified Compliance</h3>
               <p className="text-muted-foreground">
-                Never miss a filing deadline with our comprehensive compliance calendar and reminders.
+                Navigate India's complex regulatory landscape with ease through our automated compliance tools and expert guidance.
               </p>
             </div>
             
             <div className="bg-card p-6 rounded-lg shadow-sm">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <FileCheck className="h-6 w-6" />
+                <Landmark className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Document Management</h3>
+              <h3 className="text-xl font-semibold mb-2">Government Interface</h3>
               <p className="text-muted-foreground">
-                Store and organize all your business documents securely in one centralized location.
+                Interact seamlessly with various Indian government departments through our simplified dashboard.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Business Impact Stats */}
+      <section className="py-20 px-4 bg-primary/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Making an Impact on Indian Business</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Our platform is helping transform India's business environment through measurable improvements.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-6 text-center">
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-primary mb-2">60%</div>
+              <p className="text-muted-foreground">Reduction in registration time compared to traditional methods</p>
+            </div>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-primary mb-2">100+</div>
+              <p className="text-muted-foreground">Compliance requirements automated across different business types</p>
+            </div>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-primary mb-2">5,000+</div>
+              <p className="text-muted-foreground">Indian businesses already using our platform</p>
+            </div>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="text-4xl font-bold text-primary mb-2">₹10Cr+</div>
+              <p className="text-muted-foreground">Saved in potential compliance penalties for our clients</p>
             </div>
           </div>
         </div>
@@ -154,12 +190,12 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Simplify Your Business Compliance?</h2>
+          <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Business Journey in India?</h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Join thousands of businesses that trust CompliEasy for their registration and compliance needs.
+            Join thousands of entrepreneurs who are navigating India's business landscape with ease using CompliEasy.
           </p>
           <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
-            Get Started Today <ArrowRight className="h-4 w-4" />
+            Begin Your Success Story <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </section>
@@ -171,7 +207,7 @@ const Index = () => {
             <div>
               <Logo className="mb-4" />
               <p className="text-muted-foreground text-sm">
-                Simplifying company registration and compliance management for Indian businesses.
+                Transforming the ease of doing business in India through simplified registration and compliance management.
               </p>
             </div>
             
@@ -188,6 +224,7 @@ const Index = () => {
             <div>
               <h4 className="font-semibold mb-3">Company</h4>
               <ul className="space-y-2">
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/mission')}>Our Mission</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/about')}>About Us</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/contact')}>Contact</Button></li>
               </ul>

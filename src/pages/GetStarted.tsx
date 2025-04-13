@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
-import { Building, ArrowRight, FileCheck } from 'lucide-react';
+import { Building, ArrowRight, FileCheck, GanttChart, Landmark } from 'lucide-react';
 
 const GetStarted = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const GetStarted = () => {
           <Logo className="mx-auto mb-4" />
           <h1 className="text-3xl font-bold tracking-tight mb-3">Welcome to CompliEasy</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Your all-in-one platform for company registration and compliance management in India.
+            Simplifying the business landscape in India with our all-in-one platform for company registration and compliance management.
           </p>
         </div>
         
@@ -28,7 +28,7 @@ const GetStarted = () => {
               </div>
               <CardTitle>Register a New Company</CardTitle>
               <CardDescription>
-                Start your entrepreneurial journey with proper legal structure.
+                Start your entrepreneurial journey with minimal bureaucratic hassle.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -39,7 +39,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Choose from Private Limited, LLP, or OPC</span>
+                  <span className="text-sm">60% faster than traditional registration methods</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="h-5 w-5 flex items-center justify-center rounded-full bg-green-100 text-green-600 mt-0.5">
@@ -47,7 +47,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Complete registration in as little as 15 days</span>
+                  <span className="text-sm">Guided process for all Indian business structures</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="h-5 w-5 flex items-center justify-center rounded-full bg-green-100 text-green-600 mt-0.5">
@@ -55,7 +55,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Expert guidance throughout the process</span>
+                  <span className="text-sm">Support for all regulatory requirements</span>
                 </li>
               </ul>
             </CardContent>
@@ -70,11 +70,11 @@ const GetStarted = () => {
           <Card>
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <FileCheck className="h-6 w-6" />
+                <GanttChart className="h-6 w-6" />
               </div>
               <CardTitle>Manage Existing Business</CardTitle>
               <CardDescription>
-                Streamline compliance for your already registered company.
+                Simplify compliance for your already registered Indian company.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -85,7 +85,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Track all compliance deadlines in one place</span>
+                  <span className="text-sm">Automated compliance alerts for all Indian regulations</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="h-5 w-5 flex items-center justify-center rounded-full bg-green-100 text-green-600 mt-0.5">
@@ -93,7 +93,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Store all business documents securely</span>
+                  <span className="text-sm">Secure document storage for all business filings</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="h-5 w-5 flex items-center justify-center rounded-full bg-green-100 text-green-600 mt-0.5">
@@ -101,7 +101,7 @@ const GetStarted = () => {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <span className="text-sm">Professional support for all filings</span>
+                  <span className="text-sm">Expert guidance for all regulatory requirements</span>
                 </li>
               </ul>
             </CardContent>

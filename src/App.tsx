@@ -11,6 +11,7 @@ import TasksPage from "./pages/TasksPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
+import Mission from "./pages/Mission";
 import Pricing from "./pages/Pricing";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
@@ -65,6 +66,7 @@ const App = () => {
                 </ProtectedRoute>
               } />
               <Route path="/about" element={<About />} />
+              <Route path="/mission" element={<Mission />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
