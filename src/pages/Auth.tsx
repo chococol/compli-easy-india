@@ -1,15 +1,17 @@
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Logo from '@/components/Logo';
 
 type AuthMode = 'signIn' | 'signUp';
@@ -17,28 +19,53 @@ type AuthMode = 'signIn' | 'signUp';
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  role: z.enum(['business', 'professional']).optional(),
+  professionalType: z.enum(['CA', 'CS']).optional(),
 });
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('signIn');
-  const { signIn, signUp, isOnboardingComplete } = useAuth();
+  const [userType, setUserType] = useState<'business' | 'professional'>('business');
+  const { signIn, signUp, userProfile, isOnboardingComplete } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  const initialRole = searchParams.get('role') as UserRole || 'business';
+  
+  useEffect(() => {
+    // Set the mode based on URL parameter if present
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'signup') {
+      setMode('signUp');
+    }
+    
+    // Set the user type based on URL parameter if present
+    const role = searchParams.get('role');
+    if (role === 'professional') {
+      setUserType('professional');
+    } else if (role === 'business') {
+      setUserType('business');
+    }
+  }, [searchParams]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
+      role: initialRole,
+      professionalType: undefined,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { email, password } = values;
+      const { email, password, professionalType } = values;
+      const role = userType as UserRole;
       
       if (mode === 'signIn') {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(email, password, role);
         if (error) {
           toast({
             title: "Error signing in",
@@ -50,15 +77,24 @@ const Auth = () => {
             title: "Welcome back!",
             description: "You have successfully signed in.",
           });
-          // Redirect based on onboarding status
-          if (isOnboardingComplete) {
-            navigate('/dashboard');
+          
+          // Different redirect paths based on user role
+          if (userProfile?.role === 'professional') {
+            if (isOnboardingComplete) {
+              navigate('/professional/dashboard');
+            } else {
+              navigate('/professional/onboarding');
+            }
           } else {
-            navigate('/onboarding');
+            if (isOnboardingComplete) {
+              navigate('/dashboard');
+            } else {
+              navigate('/onboarding');
+            }
           }
         }
       } else {
-        const { error } = await signUp(email, password);
+        const { error } = await signUp(email, password, role, userType === 'professional' ? professionalType as 'CA' | 'CS' : undefined);
         if (error) {
           toast({
             title: "Error signing up",
@@ -70,8 +106,13 @@ const Auth = () => {
             title: "Account created!",
             description: "Please check your email to confirm your account.",
           });
-          // New users always go to onboarding
-          navigate('/onboarding');
+          
+          // Different redirect paths based on user role
+          if (userType === 'professional') {
+            navigate('/professional/onboarding');
+          } else {
+            navigate('/onboarding');
+          }
         }
       }
     } catch (error: any) {
@@ -106,7 +147,25 @@ const Auth = () => {
                 : 'Sign up for a new account to get started'}
             </CardDescription>
           </CardHeader>
+          
           <CardContent>
+            <Tabs value={userType} onValueChange={(v) => setUserType(v as 'business' | 'professional')} className="mb-4">
+              <TabsList className="grid grid-cols-2 mb-2">
+                <TabsTrigger value="business">Business</TabsTrigger>
+                <TabsTrigger value="professional">CA/CS Professional</TabsTrigger>
+              </TabsList>
+              <TabsContent value="business">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Sign {mode === 'signIn' ? 'in to' : 'up for'} your business account to manage your compliance needs
+                </p>
+              </TabsContent>
+              <TabsContent value="professional">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Sign {mode === 'signIn' ? 'in to' : 'up for'} your professional account to manage your clients' compliance
+                </p>
+              </TabsContent>
+            </Tabs>
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
@@ -135,6 +194,33 @@ const Auth = () => {
                     </FormItem>
                   )}
                 />
+                
+                {mode === 'signUp' && userType === 'professional' && (
+                  <FormField
+                    control={form.control}
+                    name="professionalType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Professional Type</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select your professional type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="CA">Chartered Accountant (CA)</SelectItem>
+                            <SelectItem value="CS">Company Secretary (CS)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 
                 <Button type="submit" className="w-full">
                   {mode === 'signIn' ? 'Sign In' : 'Create Account'}

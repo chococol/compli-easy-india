@@ -18,8 +18,13 @@ import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
+import ProfessionalOnboarding from "./pages/ProfessionalOnboarding";
+import ProfessionalDashboard from "./pages/ProfessionalDashboard";
+import ClientDetailsPage from "./pages/ClientDetailsPage";
+import ClientDocumentsPage from "./pages/ClientDocumentsPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfessionalProtectedRoute from "./components/ProfessionalProtectedRoute";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -45,7 +50,16 @@ const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/mission" element={<Mission />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/auth" element={<Auth />} />
+              
+              {/* Business user routes */}
               <Route path="/dashboard" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <Dashboard />
@@ -76,12 +90,30 @@ const App = () => {
                   <DocumentViewPage />
                 </ProtectedRoute>
               } />
-              <Route path="/about" element={<About />} />
-              <Route path="/mission" element={<Mission />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/auth" element={<Auth />} />
+              
+              {/* Professional user routes */}
+              <Route path="/professional/onboarding" element={
+                <ProfessionalProtectedRoute requiresOnboarding={false}>
+                  <ProfessionalOnboarding />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/dashboard" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <ProfessionalDashboard />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/clients/:clientId" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <ClientDetailsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/clients/:clientId/documents" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <ClientDocumentsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              
+              {/* Fallback for not found routes */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>

@@ -4,15 +4,28 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
+export type UserRole = 'business' | 'professional';
+
+type UserProfile = {
+  id: string;
+  role: UserRole;
+  professionalType?: 'CA' | 'CS';
+  businessName?: string;
+  isOnboardingComplete: boolean;
+  email: string;
+};
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userProfile: UserProfile | null;
   isOnboardingComplete: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string, role?: UserRole) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, role: UserRole, professionalType?: 'CA' | 'CS') => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   completeOnboarding: (businessStructure: string) => Promise<void>;
+  completeProfessionalOnboarding: (details: { fullName: string, licenseNumber: string }) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,27 +34,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const navigate = useNavigate();
 
-  // Function to check if user has completed onboarding
-  const checkOnboardingStatus = async (userId: string) => {
+  // Function to fetch the user profile
+  const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Check for business profile first
+      let { data: businessData, error: businessError } = await supabase
         .from('user_onboarding')
-        .select('is_complete')
+        .select('*')
         .eq('user_id', userId)
         .single();
       
-      if (error) {
-        console.error('Error fetching onboarding status:', error);
-        setIsOnboardingComplete(false);
+      if (businessData) {
+        setUserProfile({
+          id: userId,
+          role: 'business',
+          isOnboardingComplete: businessData.is_complete || false,
+          email: user?.email || '',
+        });
+        setIsOnboardingComplete(businessData.is_complete || false);
         return;
       }
       
-      setIsOnboardingComplete(data?.is_complete || false);
+      // Check for professional profile if business profile not found
+      let { data: professionalData, error: professionalError } = await supabase
+        .from('professional_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      if (professionalData) {
+        setUserProfile({
+          id: userId,
+          role: 'professional',
+          professionalType: professionalData.professional_type,
+          isOnboardingComplete: professionalData.is_onboarding_complete || false,
+          email: user?.email || '',
+        });
+        setIsOnboardingComplete(professionalData.is_onboarding_complete || false);
+        return;
+      }
+      
+      // If no profile found, set a default profile with incomplete onboarding
+      setUserProfile({
+        id: userId,
+        role: 'business', // Default role
+        isOnboardingComplete: false,
+        email: user?.email || '',
+      });
+      setIsOnboardingComplete(false);
+      
     } catch (error) {
-      console.error('Error checking onboarding status:', error);
+      console.error('Error fetching user profile:', error);
       setIsOnboardingComplete(false);
     }
   };
@@ -53,9 +100,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // When user signs in, check onboarding status
+        // When user signs in, fetch their profile
         if (session?.user) {
-          checkOnboardingStatus(session.user.id);
+          fetchUserProfile(session.user.id);
         }
       }
     );
@@ -65,9 +112,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Check onboarding status for current user
+      // Check profile for current user
       if (session?.user) {
-        checkOnboardingStatus(session.user.id);
+        fetchUserProfile(session.user.id);
       }
       
       setLoading(false);
@@ -76,18 +123,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, role?: UserRole) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (!error && user) {
+        await fetchUserProfile(user.id);
+      }
+      
       return { error };
     } catch (error) {
       return { error };
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, role: UserRole, professionalType?: 'CA' | 'CS') => {
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error, data } = await supabase.auth.signUp({ email, password });
+      
+      if (!error && data.user) {
+        // Create the appropriate profile based on role
+        if (role === 'professional' && professionalType) {
+          await supabase.from('professional_profiles').insert([
+            { 
+              user_id: data.user.id, 
+              professional_type: professionalType,
+              is_onboarding_complete: false,
+              created_at: new Date().toISOString()
+            }
+          ]);
+        }
+        
+        await fetchUserProfile(data.user.id);
+      }
+      
       return { error };
     } catch (error) {
       return { error };
@@ -96,6 +165,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUserProfile(null);
+    setIsOnboardingComplete(false);
     navigate('/');
   };
 
@@ -140,9 +211,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         setIsOnboardingComplete(true);
+        
+        if (userProfile) {
+          setUserProfile({
+            ...userProfile,
+            isOnboardingComplete: true
+          });
+        }
+        
         navigate('/dashboard');
       } catch (error) {
         console.error('Error completing onboarding:', error);
+      }
+    }
+  };
+
+  const completeProfessionalOnboarding = async (details: { fullName: string, licenseNumber: string }) => {
+    if (user && userProfile?.role === 'professional') {
+      try {
+        const { error } = await supabase
+          .from('professional_profiles')
+          .update({ 
+            full_name: details.fullName,
+            license_number: details.licenseNumber,
+            is_onboarding_complete: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error completing professional onboarding:', error);
+          return;
+        }
+
+        setIsOnboardingComplete(true);
+        
+        if (userProfile) {
+          setUserProfile({
+            ...userProfile,
+            isOnboardingComplete: true
+          });
+        }
+        
+        navigate('/professional/dashboard');
+      } catch (error) {
+        console.error('Error completing professional onboarding:', error);
       }
     }
   };
@@ -152,11 +265,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user, 
       session, 
       loading, 
+      userProfile,
       isOnboardingComplete,
       signIn, 
       signUp, 
       signOut,
-      completeOnboarding
+      completeOnboarding,
+      completeProfessionalOnboarding
     }}>
       {children}
     </AuthContext.Provider>
