@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { ProfessionalProfile } from '@/integrations/supabase/professional_types';
 
 export type UserRole = 'business' | 'professional';
 
@@ -67,14 +68,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (professionalData) {
+        const profData = professionalData as unknown as ProfessionalProfile;
         setUserProfile({
           id: userId,
           role: 'professional',
-          professionalType: professionalData.professional_type,
-          isOnboardingComplete: professionalData.is_onboarding_complete || false,
+          professionalType: profData.professional_type,
+          isOnboardingComplete: profData.is_onboarding_complete || false,
           email: user?.email || '',
         });
-        setIsOnboardingComplete(professionalData.is_onboarding_complete || false);
+        setIsOnboardingComplete(profData.is_onboarding_complete || false);
         return;
       }
       

@@ -32,7 +32,11 @@ const ProfessionalOnboarding = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await completeProfessionalOnboarding(data);
+      await completeProfessionalOnboarding({
+        fullName: data.fullName,
+        licenseNumber: data.licenseNumber,
+      });
+      
       toast({
         title: "Onboarding complete!",
         description: "Your professional profile has been set up.",
