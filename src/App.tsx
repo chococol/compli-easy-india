@@ -14,7 +14,6 @@ import DocumentViewPage from "./pages/DocumentViewPage";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Mission from "./pages/Mission";
-import Pricing from "./pages/Pricing";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -79,7 +78,6 @@ const App = () => {
               } />
               <Route path="/about" element={<About />} />
               <Route path="/mission" element={<Mission />} />
-              <Route path="/pricing" element={<Pricing />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
