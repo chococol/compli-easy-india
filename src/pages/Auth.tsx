@@ -26,7 +26,7 @@ const formSchema = z.object({
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('signIn');
   const [userType, setUserType] = useState<'business' | 'professional'>('business');
-  const { signIn, signUp, userProfile, isOnboardingComplete } = useAuth();
+  const { signIn, signUp, user, userProfile, isOnboardingComplete } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -49,6 +49,25 @@ const Auth = () => {
     }
   }, [searchParams]);
 
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      if (userProfile?.role === 'professional') {
+        if (isOnboardingComplete) {
+          navigate('/professional/dashboard');
+        } else {
+          navigate('/professional/onboarding');
+        }
+      } else {
+        if (isOnboardingComplete) {
+          navigate('/dashboard');
+        } else {
+          navigate('/onboarding');
+        }
+      }
+    }
+  }, [user, userProfile, isOnboardingComplete, navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,9 +83,12 @@ const Auth = () => {
       const { email, password, professionalType } = values;
       const role = userType as UserRole;
       
+      console.log(`Attempting ${mode} with role: ${role} ${professionalType ? `and type: ${professionalType}` : ''}`);
+      
       if (mode === 'signIn') {
         const { error } = await signIn(email, password, role);
         if (error) {
+          console.error('Sign in error:', error);
           toast({
             title: "Error signing in",
             description: error.message,
@@ -77,25 +99,21 @@ const Auth = () => {
             title: "Welcome back!",
             description: "You have successfully signed in.",
           });
-          
-          // Different redirect paths based on user role
-          if (userProfile?.role === 'professional') {
-            if (isOnboardingComplete) {
-              navigate('/professional/dashboard');
-            } else {
-              navigate('/professional/onboarding');
-            }
-          } else {
-            if (isOnboardingComplete) {
-              navigate('/dashboard');
-            } else {
-              navigate('/onboarding');
-            }
-          }
         }
       } else {
+        // Validate that professional type is selected for professional role
+        if (userType === 'professional' && !professionalType) {
+          toast({
+            title: "Professional type required",
+            description: "Please select whether you're a CA or CS professional.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         const { error } = await signUp(email, password, role, userType === 'professional' ? professionalType as 'CA' | 'CS' : undefined);
         if (error) {
+          console.error('Sign up error:', error);
           toast({
             title: "Error signing up",
             description: error.message,
@@ -107,15 +125,11 @@ const Auth = () => {
             description: "Please check your email to confirm your account.",
           });
           
-          // Different redirect paths based on user role
-          if (userType === 'professional') {
-            navigate('/professional/onboarding');
-          } else {
-            navigate('/onboarding');
-          }
+          // No need to redirect here as the auth state listener will handle it
         }
       }
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again later",
