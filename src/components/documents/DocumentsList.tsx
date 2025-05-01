@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { 
   FileText, 
   Download, 
   Eye, 
-  AlertTriangle,
   Search,
   X
 } from 'lucide-react';
@@ -91,16 +91,16 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
       
       if (error) throw error;
       
-      // Create a download link
+      // Create a download link using the browser's document object
       const blob = new Blob([data]);
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.file_name;
-      document.body.appendChild(a);
-      a.click();
+      const link = window.document.createElement('a');
+      link.href = url;
+      link.download = document.file_name;
+      window.document.body.appendChild(link);
+      link.click();
       window.URL.revokeObjectURL(url);
-      a.remove();
+      window.document.body.removeChild(link);
     } catch (error: any) {
       toast({
         title: 'Download Failed',
