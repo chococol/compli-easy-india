@@ -1,120 +1,186 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building, Calendar, FileCheck, Mail, MessageSquare, Phone, User } from 'lucide-react';
+import { 
+  Building, 
+  Calendar, 
+  FileCheck, 
+  Mail, 
+  MessageSquare, 
+  Phone, 
+  User, 
+  FileText,
+  PlusCircle,
+  Pencil
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import DocumentsList from '@/components/documents/DocumentsList';
+import DocumentUpload from '@/components/documents/DocumentUpload';
 
 type ClientDetails = {
   id: string;
   name: string;
+  company_type: string;
+  id_type: string;
+  identification: string;
   email: string;
-  phone: string;
-  industry: string;
-  registrationDate: string;
-  contactPerson: string;
-  description: string;
+  phone: string | null;
+  address: string | null;
+  compliance_status: string;
+  created_at: string;
 };
 
 type ComplianceItem = {
   id: string;
   title: string;
-  dueDate: string;
-  status: 'completed' | 'pending' | 'in-progress' | 'overdue';
+  due_date: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'overdue';
   category: string;
-  description: string;
+  description: string | null;
 };
 
 const ClientDetailsPage = () => {
   const { clientId } = useParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [client, setClient] = useState<ClientDetails | null>(null);
   const [complianceItems, setComplianceItems] = useState<ComplianceItem[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDocumentsLoading, setIsDocumentsLoading] = useState(true);
 
   useEffect(() => {
     const fetchClientData = async () => {
+      if (!clientId || !user) return;
+      
       setIsLoading(true);
       try {
-        // Mock data - in real app, you'd fetch from your database
-        setTimeout(() => {
-          setClient({
-            id: clientId as string,
-            name: 'Acme Corporation',
-            email: 'contact@acmecorp.com',
-            phone: '+91 98765 43210',
-            industry: 'Technology',
-            registrationDate: '2024-01-15',
-            contactPerson: 'Jane Smith',
-            description: 'A leading technology company specializing in innovative solutions.'
-          });
+        // Fetch client details
+        const { data: clientData, error: clientError } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('id', clientId)
+          .eq('professional_id', user.id)
+          .single();
           
-          setComplianceItems([
-            {
-              id: '1',
-              title: 'GST Return Filing',
-              dueDate: '2025-05-15',
-              status: 'pending',
-              category: 'Tax',
-              description: 'Monthly GST return for April 2025'
-            },
-            {
-              id: '2',
-              title: 'Annual ROC Filing',
-              dueDate: '2025-06-30',
-              status: 'in-progress',
-              category: 'Regulatory',
-              description: 'Annual return to be filed with Registrar of Companies'
-            },
-            {
-              id: '3',
-              title: 'TDS Return',
-              dueDate: '2025-05-07',
-              status: 'overdue',
-              category: 'Tax',
-              description: 'Quarterly TDS return for Q4 2024-25'
-            },
-            {
-              id: '4',
-              title: 'Board Meeting Minutes',
-              dueDate: '2025-04-15',
-              status: 'completed',
-              category: 'Corporate',
-              description: 'Minutes of the board meeting held on April 10, 2025'
-            }
-          ]);
+        if (clientError) throw clientError;
+        
+        setClient(clientData);
+        
+        // Fetch compliance tasks
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('compliance_tasks')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('due_date', { ascending: true });
           
-          setIsLoading(false);
-        }, 800);
-      } catch (error) {
+        if (tasksError) throw tasksError;
+        
+        setComplianceItems(tasksData || []);
+      } catch (error: any) {
         toast({
           title: "Error",
           description: "Failed to fetch client details",
           variant: "destructive",
         });
+      } finally {
         setIsLoading(false);
       }
     };
     
-    fetchClientData();
-  }, [clientId, toast]);
-  
-  const updateStatus = (itemId: string, newStatus: ComplianceItem['status']) => {
-    setComplianceItems(prev => 
-      prev.map(item => 
-        item.id === itemId 
-          ? { ...item, status: newStatus } 
-          : item
-      )
-    );
+    const fetchDocuments = async () => {
+      if (!clientId) return;
+      
+      setIsDocumentsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('client_documents')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('uploaded_at', { ascending: false })
+          .limit(5);
+          
+        if (error) throw error;
+        
+        setDocuments(data || []);
+      } catch (error: any) {
+        console.error('Error fetching documents:', error);
+      } finally {
+        setIsDocumentsLoading(false);
+      }
+    };
     
-    toast({
-      title: "Status updated",
-      description: `Compliance item status changed to ${newStatus}`,
-    });
+    fetchClientData();
+    fetchDocuments();
+  }, [clientId, toast, user]);
+  
+  const updateTaskStatus = async (taskId: string, newStatus: ComplianceItem['status']) => {
+    try {
+      const { error } = await supabase
+        .from('compliance_tasks')
+        .update({ status: newStatus })
+        .eq('id', taskId);
+        
+      if (error) throw error;
+      
+      // Update local state
+      setComplianceItems(prev => 
+        prev.map(item => 
+          item.id === taskId 
+            ? { ...item, status: newStatus } 
+            : item
+        )
+      );
+      
+      toast({
+        title: "Status updated",
+        description: `Compliance item status changed to ${newStatus}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleDocumentUploadSuccess = async () => {
+    if (!clientId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('client_documents')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('uploaded_at', { ascending: false })
+        .limit(5);
+        
+      if (error) throw error;
+      
+      setDocuments(data || []);
+    } catch (error: any) {
+      console.error('Error refreshing documents:', error);
+    }
+  };
+  
+  const handleAddComplianceTask = () => {
+    navigate(`/professional/clients/${clientId}/compliance/add`);
+  };
+  
+  const handleViewAllDocuments = () => {
+    navigate(`/professional/clients/${clientId}/documents`);
+  };
+  
+  const handleEditClient = () => {
+    navigate(`/professional/clients/${clientId}/edit`);
   };
   
   if (isLoading) {
@@ -135,10 +201,29 @@ const ClientDetailsPage = () => {
           <p className="text-muted-foreground mt-2">
             The client you're looking for doesn't exist or you don't have permission to view it.
           </p>
+          <Button 
+            className="mt-4"
+            onClick={() => navigate('/professional/clients')}
+          >
+            View All Clients
+          </Button>
         </div>
       </MainLayout>
     );
   }
+  
+  const getCompanyTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      private_limited: 'Private Limited',
+      public_limited: 'Public Limited',
+      llp: 'LLP',
+      partnership: 'Partnership',
+      proprietorship: 'Proprietorship',
+      individual: 'Individual',
+      other: 'Other'
+    };
+    return types[type] || type;
+  };
   
   return (
     <MainLayout>
@@ -149,13 +234,13 @@ const ClientDetailsPage = () => {
             <p className="text-muted-foreground mt-1">Client management and compliance overview</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Message
+            <Button variant="outline" onClick={handleEditClient}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit Details
             </Button>
-            <Button>
-              <Calendar className="mr-2 h-4 w-4" />
-              Schedule Meeting
+            <Button onClick={handleAddComplianceTask}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Compliance Task
             </Button>
           </div>
         </header>
@@ -169,8 +254,16 @@ const ClientDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <Building className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Industry</p>
-                  <p>{client.industry}</p>
+                  <p className="text-sm text-muted-foreground">Company Type</p>
+                  <p>{getCompanyTypeLabel(client.company_type)}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <FileCheck className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">{client.id_type}</p>
+                  <p>{client.identification}</p>
                 </div>
               </div>
               
@@ -182,27 +275,31 @@ const ClientDetailsPage = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p>{client.phone}</p>
+              {client.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Phone</p>
+                    <p>{client.phone}</p>
+                  </div>
                 </div>
-              </div>
+              )}
               
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Contact Person</p>
-                  <p>{client.contactPerson}</p>
+              {client.address && (
+                <div className="flex items-center gap-3">
+                  <Building className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Address</p>
+                    <p>{client.address}</p>
+                  </div>
                 </div>
-              </div>
+              )}
               
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Registration Date</p>
-                  <p>{new Date(client.registrationDate).toLocaleDateString()}</p>
+                  <p>{new Date(client.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
             </CardContent>
@@ -214,53 +311,94 @@ const ClientDetailsPage = () => {
               <CardDescription>Track and update compliance status for this client</CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="pending" className="space-y-4">
+              <Tabs defaultValue="all" className="space-y-4">
                 <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="pending">Pending</TabsTrigger>
                   <TabsTrigger value="in-progress">In Progress</TabsTrigger>
                   <TabsTrigger value="completed">Completed</TabsTrigger>
                   <TabsTrigger value="overdue">Overdue</TabsTrigger>
-                  <TabsTrigger value="all">All</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="all" className="space-y-4">
                   <ComplianceTable 
                     items={complianceItems} 
-                    updateStatus={updateStatus} 
+                    updateStatus={updateTaskStatus} 
+                    isLoading={isLoading}
                   />
                 </TabsContent>
                 
                 <TabsContent value="pending" className="space-y-4">
                   <ComplianceTable 
                     items={complianceItems.filter(item => item.status === 'pending')} 
-                    updateStatus={updateStatus} 
+                    updateStatus={updateTaskStatus} 
+                    isLoading={isLoading}
                   />
                 </TabsContent>
                 
                 <TabsContent value="in-progress" className="space-y-4">
                   <ComplianceTable 
                     items={complianceItems.filter(item => item.status === 'in-progress')} 
-                    updateStatus={updateStatus} 
+                    updateStatus={updateTaskStatus} 
+                    isLoading={isLoading}
                   />
                 </TabsContent>
                 
                 <TabsContent value="completed" className="space-y-4">
                   <ComplianceTable 
                     items={complianceItems.filter(item => item.status === 'completed')} 
-                    updateStatus={updateStatus} 
+                    updateStatus={updateTaskStatus} 
+                    isLoading={isLoading}
                   />
                 </TabsContent>
                 
                 <TabsContent value="overdue" className="space-y-4">
                   <ComplianceTable 
                     items={complianceItems.filter(item => item.status === 'overdue')} 
-                    updateStatus={updateStatus} 
+                    updateStatus={updateTaskStatus} 
+                    isLoading={isLoading}
                   />
                 </TabsContent>
               </Tabs>
+              
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={handleAddComplianceTask}
+                  variant="outline"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add New Task
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Documents</CardTitle>
+              <CardDescription>Latest documents for {client.name}</CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <DocumentUpload 
+                clientId={client.id} 
+                onSuccess={handleDocumentUploadSuccess}
+              />
+              <Button variant="outline" onClick={handleViewAllDocuments}>
+                <FileText className="mr-2 h-4 w-4" />
+                View All Documents
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <DocumentsList
+              documents={documents}
+              isLoading={isDocumentsLoading}
+              noDocumentsMessage="No documents uploaded yet for this client"
+            />
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );
@@ -269,11 +407,35 @@ const ClientDetailsPage = () => {
 interface ComplianceTableProps {
   items: ComplianceItem[];
   updateStatus: (id: string, status: ComplianceItem['status']) => void;
+  isLoading: boolean;
 }
 
-const ComplianceTable: React.FC<ComplianceTableProps> = ({ items, updateStatus }) => {
+const ComplianceTable: React.FC<ComplianceTableProps> = ({ items, updateStatus, isLoading }) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="flex items-center justify-between py-3 border-b">
+            <div className="space-y-1 w-1/2">
+              <div className="h-4 bg-muted animate-pulse rounded w-3/4"></div>
+              <div className="h-3 bg-muted animate-pulse rounded w-1/2"></div>
+            </div>
+            <div className="flex gap-4">
+              <div className="h-4 bg-muted animate-pulse rounded w-16"></div>
+              <div className="h-8 bg-muted animate-pulse rounded w-20"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  
   if (items.length === 0) {
-    return <div className="text-center py-6 text-muted-foreground">No items found</div>;
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No compliance tasks found</p>
+      </div>
+    );
   }
   
   const getStatusBadgeClass = (status: string) => {
@@ -313,7 +475,7 @@ const ComplianceTable: React.FC<ComplianceTableProps> = ({ items, updateStatus }
                 </div>
               </td>
               <td className="py-3 px-2">{item.category}</td>
-              <td className="py-3 px-2">{new Date(item.dueDate).toLocaleDateString()}</td>
+              <td className="py-3 px-2">{new Date(item.due_date).toLocaleDateString()}</td>
               <td className="py-3 px-2">
                 <span className={`${getStatusBadgeClass(item.status)} rounded px-2 py-1 text-xs font-medium capitalize`}>
                   {item.status}

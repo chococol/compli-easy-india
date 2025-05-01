@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import ProfessionalClientsList from '@/components/professional/ProfessionalClientsList';
+import { useNavigate } from 'react-router-dom';
 
 type ClientSummary = {
   id: string;
@@ -19,61 +20,150 @@ type ClientSummary = {
   lastActivity: string;
 };
 
+type DeadlineType = {
+  id: string;
+  clientName: string;
+  clientId: string;
+  filingType: string;
+  dueDate: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'not-started';
+};
+
 const ProfessionalDashboard = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [clients, setClients] = useState<ClientSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Mock clients data
-  const mockClients: ClientSummary[] = [
-    {
-      id: '1',
-      businessName: 'Acme Corp',
-      pendingCompliance: 3,
-      totalCompliance: 12,
-      riskLevel: 'medium',
-      lastActivity: '2025-04-25',
-    },
-    {
-      id: '2',
-      businessName: 'TechSolutions Ltd',
-      pendingCompliance: 1,
-      totalCompliance: 8,
-      riskLevel: 'low',
-      lastActivity: '2025-04-28',
-    },
-    {
-      id: '3',
-      businessName: 'Global Ventures',
-      pendingCompliance: 5,
-      totalCompliance: 10,
-      riskLevel: 'high',
-      lastActivity: '2025-04-20',
-    },
-    {
-      id: '4',
-      businessName: 'Innova Enterprises',
-      pendingCompliance: 2,
-      totalCompliance: 15,
-      riskLevel: 'medium',
-      lastActivity: '2025-04-23',
-    },
-  ];
+  const [deadlines, setDeadlines] = useState<DeadlineType[]>([]);
+  const [deadlinesLoading, setDeadlinesLoading] = useState(true);
   
   useEffect(() => {
     const fetchClients = async () => {
+      if (!user) return;
+      
       setIsLoading(true);
-      // In a real implementation, this would fetch from your database
-      // For now, we'll use the mock data
-      setTimeout(() => {
-        setClients(mockClients);
+      
+      try {
+        // Fetch clients
+        const { data: clientsData, error: clientsError } = await supabase
+          .from('clients')
+          .select('id, name, compliance_status, created_at')
+          .eq('professional_id', user.id);
+          
+        if (clientsError) throw clientsError;
+        
+        // Fetch compliance tasks to calculate stats
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('compliance_tasks')
+          .select('client_id, status')
+          .eq('professional_id', user.id);
+          
+        if (tasksError) throw tasksError;
+        
+        // Process data to create client summaries
+        const clientSummaries: ClientSummary[] = (clientsData || []).map(client => {
+          const clientTasks = tasksData?.filter(task => task.client_id === client.id) || [];
+          const pendingTasks = clientTasks.filter(task => 
+            task.status === 'pending' || task.status === 'in-progress'
+          ).length;
+          
+          // Calculate risk level based on percentage of pending tasks
+          let riskLevel: 'low' | 'medium' | 'high' = 'low';
+          if (clientTasks.length > 0) {
+            const pendingPercentage = (pendingTasks / clientTasks.length) * 100;
+            if (pendingPercentage >= 70) riskLevel = 'high';
+            else if (pendingPercentage >= 30) riskLevel = 'medium';
+          }
+          
+          return {
+            id: client.id,
+            businessName: client.name,
+            pendingCompliance: pendingTasks,
+            totalCompliance: clientTasks.length,
+            riskLevel,
+            lastActivity: client.created_at,
+          };
+        });
+        
+        setClients(clientSummaries);
+      } catch (error: any) {
+        console.error('Error fetching clients:', error);
+        toast({
+          title: 'Failed to load clients',
+          description: error.message,
+          variant: 'destructive',
+        });
+        // Set empty data to prevent loading indicator from showing indefinitely
+        setClients([]);
+      } finally {
         setIsLoading(false);
-      }, 500);
+      }
     };
     
-    fetchClients();
-  }, []);
+    const fetchDeadlines = async () => {
+      if (!user) return;
+      
+      setDeadlinesLoading(true);
+      
+      try {
+        // Fetch upcoming deadlines
+        const { data: deadlinesData, error: deadlinesError } = await supabase
+          .from('compliance_deadlines')
+          .select('id, title, due_date, status, client_id')
+          .eq('professional_id', user.id)
+          .gte('due_date', new Date().toISOString())
+          .order('due_date', { ascending: true })
+          .limit(5);
+          
+        if (deadlinesError) throw deadlinesError;
+        
+        // If we have deadlines, fetch client details
+        if (deadlinesData && deadlinesData.length > 0) {
+          const clientIds = deadlinesData.map(deadline => deadline.client_id);
+          
+          const { data: clientsData, error: clientsError } = await supabase
+            .from('clients')
+            .select('id, name')
+            .in('id', clientIds);
+            
+          if (clientsError) throw clientsError;
+          
+          // Map client names to deadlines
+          const deadlinesWithClientNames: DeadlineType[] = deadlinesData.map(deadline => {
+            const client = clientsData?.find(c => c.id === deadline.client_id);
+            return {
+              id: deadline.id,
+              clientName: client?.name || 'Unknown Client',
+              clientId: deadline.client_id,
+              filingType: deadline.title,
+              dueDate: deadline.due_date,
+              status: deadline.status || 'pending',
+            };
+          });
+          
+          setDeadlines(deadlinesWithClientNames);
+        } else {
+          setDeadlines([]);
+        }
+      } catch (error: any) {
+        console.error('Error fetching deadlines:', error);
+        toast({
+          title: 'Failed to load deadlines',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setDeadlines([]);
+      } finally {
+        setDeadlinesLoading(false);
+      }
+    };
+    
+    if (user) {
+      fetchClients();
+      fetchDeadlines();
+    }
+  }, [user, toast]);
   
   // Calculate dashboard metrics
   const totalClients = clients.length;
@@ -81,10 +171,7 @@ const ProfessionalDashboard = () => {
   const highRiskClients = clients.filter(client => client.riskLevel === 'high').length;
   
   const addNewClient = () => {
-    toast({
-      title: "Feature coming soon",
-      description: "The ability to add new clients will be available shortly.",
-    });
+    navigate('/professional/clients/add');
   };
   
   return (
@@ -134,7 +221,7 @@ const ProfessionalDashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <DeadlineTable />
+            <DeadlineTable deadlines={deadlines} isLoading={deadlinesLoading} />
           </CardContent>
         </Card>
         
@@ -144,31 +231,42 @@ const ProfessionalDashboard = () => {
   );
 };
 
-const DeadlineTable = () => {
-  // Mock deadlines data
-  const deadlines = [
-    {
-      id: '1',
-      clientName: 'Acme Corp',
-      filingType: 'GST Return',
-      dueDate: 'May 15, 2025',
-      status: 'pending'
-    },
-    {
-      id: '2',
-      clientName: 'TechSolutions Ltd',
-      filingType: 'Annual Returns',
-      dueDate: 'May 20, 2025',
-      status: 'in-progress'
-    },
-    {
-      id: '3',
-      clientName: 'Global Ventures',
-      filingType: 'Tax Audit',
-      dueDate: 'May 30, 2025',
-      status: 'not-started'
-    }
-  ];
+interface DeadlineTableProps {
+  deadlines: DeadlineType[];
+  isLoading: boolean;
+}
+
+const DeadlineTable: React.FC<DeadlineTableProps> = ({ deadlines, isLoading }) => {
+  const navigate = useNavigate();
+  
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center">
+          <div className="w-1/4"><div className="h-6 w-24 bg-muted animate-pulse rounded"></div></div>
+          <div className="w-1/4"><div className="h-6 w-32 bg-muted animate-pulse rounded"></div></div>
+          <div className="w-1/4"><div className="h-6 w-24 bg-muted animate-pulse rounded"></div></div>
+          <div className="w-1/4"><div className="h-6 w-16 bg-muted animate-pulse rounded"></div></div>
+        </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="flex items-center">
+            <div className="w-1/4"><div className="h-6 w-28 bg-muted animate-pulse rounded"></div></div>
+            <div className="w-1/4"><div className="h-6 w-36 bg-muted animate-pulse rounded"></div></div>
+            <div className="w-1/4"><div className="h-6 w-28 bg-muted animate-pulse rounded"></div></div>
+            <div className="w-1/4"><div className="h-6 w-20 bg-muted animate-pulse rounded"></div></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  
+  if (deadlines.length === 0) {
+    return (
+      <div className="text-center py-6">
+        <p className="text-muted-foreground">No upcoming deadlines</p>
+      </div>
+    );
+  }
   
   return (
     <div className="overflow-x-auto">
@@ -187,12 +285,18 @@ const DeadlineTable = () => {
             <tr key={deadline.id} className="border-b hover:bg-muted/50">
               <td className="py-3 px-2">{deadline.clientName}</td>
               <td className="py-3 px-2">{deadline.filingType}</td>
-              <td className="py-3 px-2">{deadline.dueDate}</td>
+              <td className="py-3 px-2">{new Date(deadline.dueDate).toLocaleDateString()}</td>
               <td className="py-3 px-2">
                 <StatusBadge status={deadline.status} />
               </td>
               <td className="py-3 px-2 text-right">
-                <Button variant="ghost" size="sm">View Details</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => navigate(`/professional/clients/${deadline.clientId}`)}
+                >
+                  View Details
+                </Button>
               </td>
             </tr>
           ))}

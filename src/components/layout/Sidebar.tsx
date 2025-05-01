@@ -10,12 +10,15 @@ import {
   Settings,
   Building,
   Users,
-  Calendar
+  Calendar,
+  Plus,
+  UserPlus
 } from 'lucide-react';
 
 const professionalNavItems = [
   { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
   { icon: Users, label: 'Clients', path: '/professional/clients' },
+  { icon: UserPlus, label: 'Add Client', path: '/professional/clients/add' },
   { icon: Calendar, label: 'Compliance Calendar', path: '/professional/calendar' },
   { icon: FileText, label: 'Documents', path: '/professional/documents' },
   { icon: MessageSquare, label: 'Messages', path: '/professional/messages' },
