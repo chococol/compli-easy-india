@@ -5,7 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, FileText, ClipboardCheck, Key, Download, Calendar, Eye, EyeOff, Edit } from 'lucide-react';
+import { Building, FileText, ClipboardCheck, Key, Download, Calendar, Eye, EyeOff, Edit, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import DocumentUpload from '@/components/documents/DocumentUpload';
 
