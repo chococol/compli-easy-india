@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -21,6 +21,7 @@ type FormData = z.infer<typeof formSchema>;
 const ProfessionalOnboarding = () => {
   const { userProfile, completeProfessionalOnboarding } = useAuth();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -32,6 +33,9 @@ const ProfessionalOnboarding = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
+      setIsSubmitting(true);
+      console.log("Submitting professional onboarding data:", data);
+      
       await completeProfessionalOnboarding({
         fullName: data.fullName,
         licenseNumber: data.licenseNumber,
@@ -42,11 +46,14 @@ const ProfessionalOnboarding = () => {
         description: "Your professional profile has been set up.",
       });
     } catch (error) {
+      console.error("Onboarding error:", error);
       toast({
         title: "Error",
         description: "Failed to complete onboarding. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -95,8 +102,8 @@ const ProfessionalOnboarding = () => {
                   )}
                 />
                 
-                <Button type="submit" className="w-full">
-                  Complete Onboarding
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Processing...' : 'Complete Onboarding'}
                 </Button>
               </form>
             </Form>

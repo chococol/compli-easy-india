@@ -275,8 +275,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeProfessionalOnboarding = async (details: { fullName: string, licenseNumber: string }) => {
-    if (user && userProfile?.role === 'professional') {
+    if (user) {
       try {
+        console.log("Completing professional onboarding with details:", details);
+        
         const { error } = await supabase
           .from('professional_profiles')
           .update({ 
@@ -289,9 +291,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (error) {
           console.error('Error completing professional onboarding:', error);
-          return;
+          throw error;
         }
 
+        console.log("Professional onboarding completed successfully");
+        
+        // Force update the local state
         setIsOnboardingComplete(true);
         
         if (userProfile) {
@@ -301,10 +306,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
         
+        // After successful onboarding, refetch the user profile to ensure we have the latest data
+        await fetchUserProfile(user.id);
+        
+        // Then navigate to dashboard
         navigate('/professional/dashboard');
       } catch (error) {
         console.error('Error completing professional onboarding:', error);
+        throw error;
       }
+    } else {
+      console.error("Cannot complete onboarding: No user is logged in");
+      throw new Error("User not logged in");
     }
   };
 

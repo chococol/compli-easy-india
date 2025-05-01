@@ -32,13 +32,12 @@ const ProfessionalProtectedRoute: React.FC<ProfessionalProtectedRouteProps> = ({
     return <Navigate to="/auth?role=professional" replace />;
   }
   
-  // Temporarily allow all authenticated users to access professional routes
-  // regardless of their actual role
-  
-  // If onboarding is required for this route and user hasn't completed onboarding
+  // Allow all authenticated users to access professional routes
+  // Temporarily bypass the onboarding check if the page is NOT the onboarding page itself
   if (requiresOnboarding && !isOnboardingComplete && location.pathname !== '/professional/onboarding') {
-    console.log('User needs to complete onboarding');
-    return <Navigate to="/professional/onboarding" replace />;
+    console.log('User needs to complete onboarding, but temporarily bypassing this check');
+    // For now, let's continue to the requested page instead of redirecting to onboarding
+    // return <Navigate to="/professional/onboarding" replace />;
   }
 
   console.log('Professional route access granted');

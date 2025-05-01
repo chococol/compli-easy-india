@@ -12,17 +12,6 @@ import {
   Users,
   Calendar
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-
-const businessNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: Building, label: 'My Company', path: '/company' },
-  { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
-  { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: MessageSquare, label: 'Messages', path: '/messages' },
-  { icon: CreditCard, label: 'Payments', path: '/payments' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
-];
 
 const professionalNavItems = [
   { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
@@ -34,7 +23,7 @@ const professionalNavItems = [
 ];
 
 const Sidebar = () => {
-  // Always show professional navigation items for now
+  // Always show professional navigation items
   const navItems = professionalNavItems;
 
   return (
