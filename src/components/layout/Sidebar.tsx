@@ -34,10 +34,8 @@ const professionalNavItems = [
 ];
 
 const Sidebar = () => {
-  const { userProfile } = useAuth();
-  const isProfessional = userProfile?.role === 'professional';
-  
-  const navItems = isProfessional ? professionalNavItems : businessNavItems;
+  // Always show professional navigation items for now
+  const navItems = professionalNavItems;
 
   return (
     <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
@@ -47,10 +45,14 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) => 
-              `nav-link ${isActive ? 'active' : ''}`
+              `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
+                isActive 
+                  ? 'bg-primary/10 text-primary font-medium' 
+                  : 'text-foreground hover:bg-muted'
+              }`
             }
           >
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-5 w-5 mr-3" />
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -60,7 +62,7 @@ const Sidebar = () => {
         <div className="px-3 py-2">
           <div className="text-sm font-medium">Need help?</div>
           <div className="text-xs text-muted-foreground mt-1">
-            Contact your {isProfessional ? 'administrator' : 'manager'} or our support team.
+            Contact your administrator or our support team.
           </div>
         </div>
       </div>

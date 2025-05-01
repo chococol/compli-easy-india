@@ -12,15 +12,13 @@ const ProfessionalProtectedRoute: React.FC<ProfessionalProtectedRouteProps> = ({
   children, 
   requiresOnboarding = true 
 }) => {
-  const { user, loading, isOnboardingComplete, userProfile } = useAuth();
+  const { user, loading, isOnboardingComplete } = useAuth();
   const location = useLocation();
 
   console.log('ProfessionalProtectedRoute:', { 
     user: user?.id, 
     loading, 
-    isOnboardingComplete, 
-    userRole: userProfile?.role,
-    professionalType: userProfile?.professionalType,
+    isOnboardingComplete,
     currentPath: location.pathname
   });
 
@@ -28,21 +26,18 @@ const ProfessionalProtectedRoute: React.FC<ProfessionalProtectedRouteProps> = ({
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  // If user is not authenticated, redirect to auth page
+  // If user is not authenticated, redirect to auth page (professional by default)
   if (!user) {
-    console.log('User not authenticated, redirecting to auth');
+    console.log('User not authenticated, redirecting to professional auth');
     return <Navigate to="/auth?role=professional" replace />;
   }
   
-  // If user is not a professional, redirect to regular auth
-  if (userProfile?.role !== 'professional') {
-    console.log('User is not a professional, redirecting to professional auth');
-    return <Navigate to="/auth?role=professional" replace />;
-  }
-
+  // Temporarily allow all authenticated users to access professional routes
+  // regardless of their actual role
+  
   // If onboarding is required for this route and user hasn't completed onboarding
   if (requiresOnboarding && !isOnboardingComplete && location.pathname !== '/professional/onboarding') {
-    console.log('Professional needs to complete onboarding');
+    console.log('User needs to complete onboarding');
     return <Navigate to="/professional/onboarding" replace />;
   }
 

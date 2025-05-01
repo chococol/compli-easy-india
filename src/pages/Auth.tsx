@@ -25,13 +25,15 @@ const formSchema = z.object({
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('signIn');
-  const [userType, setUserType] = useState<'business' | 'professional'>('business');
+  // Default to professional type
+  const [userType, setUserType] = useState<'business' | 'professional'>('professional');
   const { signIn, signUp, user, userProfile, isOnboardingComplete } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  const initialRole = searchParams.get('role') as UserRole || 'business';
+  // Default to 'professional' role
+  const initialRole = searchParams.get('role') as UserRole || 'professional';
   
   useEffect(() => {
     // Set the mode based on URL parameter if present
@@ -52,21 +54,14 @@ const Auth = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      if (userProfile?.role === 'professional') {
-        if (isOnboardingComplete) {
-          navigate('/professional/dashboard');
-        } else {
-          navigate('/professional/onboarding');
-        }
+      // Always redirect to professional dashboard for now
+      if (isOnboardingComplete) {
+        navigate('/professional/dashboard');
       } else {
-        if (isOnboardingComplete) {
-          navigate('/dashboard');
-        } else {
-          navigate('/onboarding');
-        }
+        navigate('/professional/onboarding');
       }
     }
-  }, [user, userProfile, isOnboardingComplete, navigate]);
+  }, [user, isOnboardingComplete, navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -124,8 +119,6 @@ const Auth = () => {
             title: "Account created!",
             description: "Please check your email to confirm your account.",
           });
-          
-          // No need to redirect here as the auth state listener will handle it
         }
       }
     } catch (error: any) {

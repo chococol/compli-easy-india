@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
@@ -59,17 +58,11 @@ const App = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/auth" element={<Auth />} />
               
-              {/* Business user routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute requiresOnboarding={true}>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/onboarding" element={
-                <ProtectedRoute requiresOnboarding={false}>
-                  <Onboarding />
-                </ProtectedRoute>
-              } />
+              {/* Redirect business routes to professional equivalents */}
+              <Route path="/dashboard" element={<Navigate to="/professional/dashboard" replace />} />
+              <Route path="/onboarding" element={<Navigate to="/professional/onboarding" replace />} />
+              
+              {/* Keep these routes but they'll likely not be accessed due to redirects */}
               <Route path="/tasks" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <TasksPage />
