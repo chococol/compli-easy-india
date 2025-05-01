@@ -3,12 +3,10 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, 
-  ClipboardList, 
-  FileText, 
+  Building,
   MessageSquare, 
   CreditCard, 
-  Settings, 
-  Building 
+  Settings
 } from 'lucide-react';
 import Logo from '../Logo';
 import {
@@ -24,14 +22,12 @@ interface MobileSidebarProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const navItems = [
-  { icon: Home, label: 'Dashboard', path: '/' },
-  { icon: Building, label: 'My Company', path: '/company' },
-  { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
-  { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: MessageSquare, label: 'Messages', path: '/messages' },
-  { icon: CreditCard, label: 'Payments', path: '/payments' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
+const professionalNavItems = [
+  { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
+  { icon: Building, label: 'Companies', path: '/professional/companies' },
+  { icon: CreditCard, label: 'Payments', path: '/professional/payments' },
+  { icon: MessageSquare, label: 'Messages', path: '/professional/messages' },
+  { icon: Settings, label: 'Settings', path: '/professional/settings' },
 ];
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
@@ -46,7 +42,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
         
         <div className="overflow-y-auto py-2">
           <nav className="space-y-1 px-2">
-            {navItems.map((item) => (
+            {professionalNavItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -70,7 +66,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
           <div className="text-sm">
             <div className="font-medium">Need help?</div>
             <div className="text-muted-foreground mt-1">
-              Contact your manager or our support team.
+              Contact your administrator or our support team.
             </div>
           </div>
         </SheetFooter>

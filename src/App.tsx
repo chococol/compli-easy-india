@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,11 @@ import ProfessionalOnboarding from "./pages/ProfessionalOnboarding";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
 import ClientDocumentsPage from "./pages/ClientDocumentsPage";
+import CompaniesPage from "./pages/CompaniesPage";
+import CompanyDetailsPage from "./pages/CompanyDetailsPage";
+import PaymentsPage from "./pages/PaymentsPage";
+import MessagesPage from "./pages/MessagesPage";
+import AddClientPage from "./pages/AddClientPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfessionalProtectedRoute from "./components/ProfessionalProtectedRoute";
@@ -95,6 +101,35 @@ const App = () => {
                   <ProfessionalDashboard />
                 </ProfessionalProtectedRoute>
               } />
+              
+              {/* New Professional Routes */}
+              <Route path="/professional/companies" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <CompaniesPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/companies/:companyId" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <CompanyDetailsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/companies/add" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <AddClientPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/payments" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <PaymentsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/messages" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <MessagesPage />
+                </ProfessionalProtectedRoute>
+              } />
+              
+              {/* Legacy routes - kept for compatibility */}
               <Route path="/professional/clients/:clientId" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <ClientDetailsPage />
@@ -103,6 +138,11 @@ const App = () => {
               <Route path="/professional/clients/:clientId/documents" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <ClientDocumentsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/clients/add" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <AddClientPage />
                 </ProfessionalProtectedRoute>
               } />
               

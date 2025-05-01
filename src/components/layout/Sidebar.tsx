@@ -3,36 +3,25 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, 
-  ClipboardList, 
-  FileText, 
+  Building,
   MessageSquare, 
   CreditCard, 
   Settings,
-  Building,
-  Users,
-  Calendar,
-  Plus,
-  UserPlus
 } from 'lucide-react';
 
 const professionalNavItems = [
   { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
-  { icon: Users, label: 'Clients', path: '/professional/clients' },
-  { icon: UserPlus, label: 'Add Client', path: '/professional/clients/add' },
-  { icon: Calendar, label: 'Compliance Calendar', path: '/professional/calendar' },
-  { icon: FileText, label: 'Documents', path: '/professional/documents' },
+  { icon: Building, label: 'Companies', path: '/professional/companies' },
+  { icon: CreditCard, label: 'Payments', path: '/professional/payments' },
   { icon: MessageSquare, label: 'Messages', path: '/professional/messages' },
   { icon: Settings, label: 'Settings', path: '/professional/settings' },
 ];
 
 const Sidebar = () => {
-  // Always show professional navigation items
-  const navItems = professionalNavItems;
-
   return (
     <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
       <nav className="space-y-1 mt-2">
-        {navItems.map((item) => (
+        {professionalNavItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
