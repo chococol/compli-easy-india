@@ -19,7 +19,6 @@ import {
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Document {
@@ -77,50 +76,19 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
   };
 
   const handleDownload = async (document: Document) => {
-    try {
-      // If we have a public URL, use it directly
-      if (document.public_url) {
-        window.open(document.public_url, '_blank');
-        return;
-      }
-      
-      // Otherwise, download using Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('client-documents')
-        .download(document.file_path);
-      
-      if (error) throw error;
-      
-      // Create a download link using the browser's document object
-      const blob = new Blob([data]);
-      const url = window.URL.createObjectURL(blob);
-      const link = window.document.createElement('a');
-      link.href = url;
-      link.download = document.file_name;
-      window.document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-      window.document.body.removeChild(link);
-    } catch (error: any) {
-      toast({
-        title: 'Download Failed',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
+    // This is a dummy implementation
+    toast({
+      title: 'Download Simulated',
+      description: `Document ${document.file_name} would be downloaded here`,
+    });
   };
 
   const handleView = (document: Document) => {
-    // If we have a public URL, use it to view the document
-    if (document.public_url) {
-      window.open(document.public_url, '_blank');
-    } else {
-      toast({
-        title: 'View Failed',
-        description: 'Document viewing is not available',
-        variant: 'destructive',
-      });
-    }
+    // This is a dummy implementation
+    toast({
+      title: 'View Document',
+      description: `Document ${document.file_name} would be viewed here`,
+    });
   };
 
   if (isLoading) {

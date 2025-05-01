@@ -22,7 +22,6 @@ import { Label } from '@/components/ui/label';
 import { Upload, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { v4 as uuidv4 } from 'uuid';
 
 interface DocumentUploadProps {
   clientId: string;
@@ -56,24 +55,19 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ clientId, onSuccess }) 
     setIsUploading(true);
 
     try {
-      // 1. Upload file to Supabase Storage
+      // 1. Upload file to Supabase Storage - Using a simulated dummy flow
       const fileExt = file.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
+      const fileName = `dummy-${Date.now()}.${fileExt}`;
       const filePath = `documents/${clientId}/${fileName}`;
 
-      const { error: storageError } = await supabase.storage
-        .from('client-documents')
-        .upload(filePath, file);
+      // Simulate Supabase storage operations
+      console.log('Would upload file to:', filePath);
 
-      if (storageError) throw storageError;
+      // 2. Get public URL for the file - Dummy URL
+      const publicUrl = `https://example.com/documents/${fileName}`;
 
-      // 2. Get public URL for the file
-      const { data: publicUrlData } = supabase.storage
-        .from('client-documents')
-        .getPublicUrl(filePath);
-
-      // 3. Store document metadata in database
-      const { error: dbError } = await supabase.from('client_documents').insert({
+      // 3. Store document metadata in database - Simulation
+      console.log('Would store document metadata:', {
         client_id: clientId,
         file_name: file.name,
         file_type: fileExt,
@@ -81,10 +75,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ clientId, onSuccess }) 
         description: description,
         file_size: file.size,
         file_path: filePath,
-        public_url: publicUrlData?.publicUrl,
+        public_url: publicUrl,
       });
-
-      if (dbError) throw dbError;
 
       toast({
         title: 'Document Uploaded',

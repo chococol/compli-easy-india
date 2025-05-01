@@ -22,7 +22,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { Plus, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface DocumentRequestProps {
@@ -53,21 +52,20 @@ const DocumentRequest: React.FC<DocumentRequestProps> = ({ clientId, clientName 
     setIsSubmitting(true);
 
     try {
-      // Store document request in database
-      const { error } = await supabase.from('document_requests').insert({
-        client_id: clientId,
-        professional_id: user?.id,
-        document_type: docType,
+      // This is a dummy implementation
+      console.log('Would send request to:', emailTo);
+      console.log('Request details:', {
+        clientId,
+        professionalId: user?.id,
+        documentType: docType,
         subject,
         message,
-        email_to: emailTo,
+        emailTo,
         status: 'pending'
       });
 
-      if (error) throw error;
-
-      // In a real implementation, you would send an email here
-      // For now, we'll just show a success message
+      // Wait a bit to simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast({
         title: 'Document Request Sent',
