@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -22,20 +22,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building, Briefcase, FileText } from 'lucide-react';
 
 const clientFormSchema = z.object({
-  name: z.string().min(2, { message: 'Client name must be at least 2 characters' }),
+  name: z.string().min(2, { message: 'Company name must be at least 2 characters' }),
   company_type: z.string().min(1, { message: 'Please select a company type' }),
-  id_type: z.string().min(1, { message: 'Please select an identification type' }),
-  identification: z.string().min(1, { message: 'Please enter the identification number' }),
+  cin: z.string().optional(),
+  pan: z.string().length(10, { message: 'PAN must be exactly 10 characters' }),
+  tan: z.string().optional(),
+  is_gst_registered: z.boolean().default(false),
+  gstin: z.string().optional(),
   email: z.string().email({ message: 'Please enter a valid email' }),
   phone: z.string().optional(),
   address: z.string().optional(),
+}).refine((data) => {
+  // If GST is registered, GSTIN is required
+  if (data.is_gst_registered && !data.gstin) {
+    return false;
+  }
+  return true;
+}, {
+  message: "GSTIN is required when registered for GST",
+  path: ["gstin"]
 });
 
 type ClientFormValues = z.infer<typeof clientFormSchema>;
@@ -44,14 +58,18 @@ const AddClientPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isGstRegistered, setIsGstRegistered] = useState(false);
   
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
       name: '',
       company_type: '',
-      id_type: '',
-      identification: '',
+      cin: '',
+      pan: '',
+      tan: '',
+      is_gst_registered: false,
+      gstin: '',
       email: '',
       phone: '',
       address: '',
@@ -69,17 +87,22 @@ const AddClientPage = () => {
     }
     
     try {
-      const { error } = await supabase.from('clients').insert({
+      const clientData = {
         professional_id: user.id,
         name: data.name,
         company_type: data.company_type,
-        id_type: data.id_type,
-        identification: data.identification,
+        cin: data.cin || null,
+        pan: data.pan,
+        tan: data.tan || null,
+        is_gst_registered: data.is_gst_registered,
+        gstin: data.is_gst_registered ? data.gstin : null,
         email: data.email,
         phone: data.phone || null,
         address: data.address || null,
         compliance_status: 'pending',
-      });
+      };
+      
+      const { error } = await supabase.from('clients').insert(clientData);
       
       if (error) throw error;
       
@@ -95,6 +118,14 @@ const AddClientPage = () => {
         description: error.message,
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleGstRegisteredChange = (checked: boolean) => {
+    setIsGstRegistered(checked);
+    form.setValue('is_gst_registered', checked);
+    if (!checked) {
+      form.setValue('gstin', '');
     }
   };
   
@@ -122,9 +153,11 @@ const AddClientPage = () => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Client Name</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Building className="h-4 w-4" /> Company Name
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter client name" {...field} />
+                          <Input placeholder="Enter company name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -136,7 +169,9 @@ const AddClientPage = () => {
                     name="company_type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Company Type</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Briefcase className="h-4 w-4" /> Company Type
+                        </FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -163,26 +198,18 @@ const AddClientPage = () => {
                   
                   <FormField
                     control={form.control}
-                    name="id_type"
+                    name="cin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Identification Type</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select ID type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="PAN">PAN</SelectItem>
-                            <SelectItem value="CIN">CIN</SelectItem>
-                            <SelectItem value="GSTIN">GSTIN</SelectItem>
-                            <SelectItem value="TAN">TAN</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormLabel className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" /> CIN
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter CIN" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Corporate Identity Number (if applicable)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -190,20 +217,87 @@ const AddClientPage = () => {
                   
                   <FormField
                     control={form.control}
-                    name="identification"
+                    name="pan"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Identification Number</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" /> PAN
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter ID number" {...field} />
+                          <Input placeholder="Enter PAN" {...field} />
                         </FormControl>
                         <FormDescription>
-                          The PAN, CIN, GSTIN or other identification number
+                          Permanent Account Number
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+                  <FormField
+                    control={form.control}
+                    name="tan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" /> TAN
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter TAN" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Tax Deduction Account Number (if applicable)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="is_gst_registered"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox 
+                            checked={field.value} 
+                            onCheckedChange={(checked) => {
+                              handleGstRegisteredChange(checked === true);
+                            }} 
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            GST Registered
+                          </FormLabel>
+                          <FormDescription>
+                            Check if the company is registered for GST
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {isGstRegistered && (
+                    <FormField
+                      control={form.control}
+                      name="gstin"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" /> GSTIN
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter GSTIN" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Goods and Services Tax Identification Number
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   
                   <FormField
                     control={form.control}
