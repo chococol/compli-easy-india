@@ -27,7 +27,6 @@ const Index = () => {
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
             <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
-            <Button variant="ghost" onClick={() => navigate('/pricing')}>Pricing</Button>
             <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
             <Button onClick={() => navigate('/auth')}>Get Started</Button>
