@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -68,15 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (professionalData) {
-        const profData = professionalData as unknown as ProfessionalProfile;
         setUserProfile({
           id: userId,
           role: 'professional',
-          professionalType: profData.professional_type,
-          isOnboardingComplete: profData.is_onboarding_complete || false,
+          professionalType: professionalData.professional_type as 'CA' | 'CS',
+          isOnboardingComplete: professionalData.is_onboarding_complete || false,
           email: user?.email || '',
         });
-        setIsOnboardingComplete(profData.is_onboarding_complete || false);
+        setIsOnboardingComplete(professionalData.is_onboarding_complete || false);
         return;
       }
       

@@ -84,6 +84,39 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          is_onboarding_complete: boolean
+          license_number: string | null
+          professional_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_onboarding_complete?: boolean
+          license_number?: string | null
+          professional_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_onboarding_complete?: boolean
+          license_number?: string | null
+          professional_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_onboarding: {
         Row: {
           business_structure: string

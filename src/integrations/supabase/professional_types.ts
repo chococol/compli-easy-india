@@ -3,6 +3,7 @@
 import { Database as OriginalDatabase } from './types';
 
 export interface ProfessionalProfile {
+  id: string;
   user_id: string;
   professional_type: 'CA' | 'CS';
   full_name: string | null;
@@ -17,7 +18,7 @@ export type Database = OriginalDatabase & {
     Tables: {
       professional_profiles: {
         Row: ProfessionalProfile;
-        Insert: Partial<ProfessionalProfile> & { user_id: string };
+        Insert: Partial<ProfessionalProfile> & { user_id: string; professional_type: 'CA' | 'CS' };
         Update: Partial<ProfessionalProfile>;
         Relationships: [
           {
