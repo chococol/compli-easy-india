@@ -40,7 +40,7 @@ const ClientAuth = () => {
       if (isOnboardingComplete) {
         navigate('/dashboard');
       } else {
-        navigate('/onboarding');
+        navigate('/client/onboarding');
       }
     }
   }, [user, isOnboardingComplete, navigate]);

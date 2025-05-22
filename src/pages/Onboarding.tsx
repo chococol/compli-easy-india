@@ -6,18 +6,24 @@ import OnboardingOptions from '@/components/onboarding/OnboardingOptions';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Onboarding = () => {
-  const { isOnboardingComplete } = useAuth();
+  const { isOnboardingComplete, userProfile } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check user role and redirect to appropriate onboarding page
+    if (userProfile?.role === 'business') {
+      navigate('/client/onboarding');
+      return;
+    }
+    
     // If onboarding is already complete, redirect to dashboard
     if (isOnboardingComplete) {
       navigate('/dashboard');
     }
-  }, [isOnboardingComplete, navigate]);
+  }, [isOnboardingComplete, userProfile, navigate]);
 
   // Only render the onboarding content if onboarding is not complete
-  if (isOnboardingComplete) {
+  if (isOnboardingComplete || userProfile?.role === 'business') {
     return null; // Return null while redirecting
   }
 

@@ -22,6 +22,7 @@ import Auth from "./pages/Auth";
 import ClientAuth from "./pages/ClientAuth";
 import ProfessionalAuth from "./pages/ProfessionalAuth";
 import ProfessionalOnboarding from "./pages/ProfessionalOnboarding";
+import ClientOnboarding from "./pages/ClientOnboarding";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
 import ClientDocumentsPage from "./pages/ClientDocumentsPage";
@@ -71,6 +72,9 @@ const App = () => {
               <Route path="/auth" element={<Navigate to="/professional/auth" replace />} />
               <Route path="/client/auth" element={<ClientAuth />} />
               <Route path="/professional/auth" element={<ProfessionalAuth />} />
+              
+              {/* Client onboarding */}
+              <Route path="/client/onboarding" element={<ClientOnboarding />} />
               
               {/* Redirect business routes to professional equivalents */}
               <Route path="/dashboard" element={<Navigate to="/professional/dashboard" replace />} />
