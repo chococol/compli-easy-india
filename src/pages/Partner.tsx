@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,8 +18,6 @@ const Partner = () => {
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
-            <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
-            <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
             <Button variant="ghost" onClick={() => navigate('/partner')}>Partner with Us</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
             <Button onClick={() => navigate('/auth')}>Get Started</Button>
@@ -273,7 +270,7 @@ const Partner = () => {
             <div>
               <Logo className="mb-4" />
               <p className="text-muted-foreground text-sm">
-                Transforming the ease of doing business in India through simplified registration and compliance management.
+                Revolutionizing the ease of doing business in India through simplified registration and compliance management.
               </p>
             </div>
             

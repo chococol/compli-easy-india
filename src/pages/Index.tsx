@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle, Landmark, TrendingUp, GanttChart, UserCheck, Users, Handshake } from 'lucide-react';
@@ -32,8 +31,6 @@ const Index = () => {
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
-            <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
-            <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
             <Button variant="ghost" onClick={() => navigate('/partner')}>Partner with Us</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
             <Button onClick={() => navigate('/auth')}>Get Started</Button>
@@ -48,7 +45,7 @@ const Index = () => {
             Revolutionary Business Registration & Compliance Platform
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
+            Your all-in-one platform that revolutionizes the ease of doing business in India through simplified registration, streamlined compliance, and breaking down regulatory barriers.
           </p>
           
           <div className="mb-8">
@@ -70,7 +67,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Transforming Business in India</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              CompliEasy is dedicated to improving India's business environment through innovative solutions that address key challenges faced by entrepreneurs.
+              CompliEasy is dedicated to revolutionizing India's business environment through innovative solutions that address key challenges faced by entrepreneurs.
             </p>
           </div>
           
@@ -278,7 +275,7 @@ const Index = () => {
             <div>
               <Logo className="mb-4" />
               <p className="text-muted-foreground text-sm">
-                Transforming the ease of doing business in India through simplified registration and compliance management.
+                Revolutionizing the ease of doing business in India through simplified registration and compliance management.
               </p>
             </div>
             
