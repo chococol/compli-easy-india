@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -12,6 +11,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   requiresOnboarding = true 
 }) => {
+  // Temporarily bypass all protection checks
+  // Original code is commented out for easy restoration later
+  
+  /* 
   const { user, loading, isOnboardingComplete } = useAuth();
   const location = useLocation();
 
@@ -30,7 +33,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (requiresOnboarding && !isOnboardingComplete && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
+  */
 
+  // Bypass all checks and render children directly
+  console.log('WARNING: Route protection is temporarily disabled!');
   return <>{children}</>;
 };
 

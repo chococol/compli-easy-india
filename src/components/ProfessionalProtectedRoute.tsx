@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProfessionalProtectedRouteProps {
@@ -12,6 +11,10 @@ const ProfessionalProtectedRoute: React.FC<ProfessionalProtectedRouteProps> = ({
   children, 
   requiresOnboarding = true 
 }) => {
+  // Temporarily bypass all protection checks
+  // Original code is commented out for easy restoration later
+  
+  /*
   const { user, loading, isOnboardingComplete } = useAuth();
   const location = useLocation();
 
@@ -40,6 +43,10 @@ const ProfessionalProtectedRoute: React.FC<ProfessionalProtectedRouteProps> = ({
   }
 
   console.log('Professional route access granted');
+  */
+  
+  // Bypass all checks and render children directly
+  console.log('WARNING: Professional route protection is temporarily disabled!');
   return <>{children}</>;
 };
 
