@@ -35,7 +35,7 @@ const Partner = () => {
             Partner With CompliEasy
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            A dedicated platform for CA/CS professionals to expand their practice and provide enhanced services to clients.
+            A revolutionary platform for CA/CS professionals to expand their practice and provide enhanced services to clients.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" onClick={() => navigate('/auth?role=professional')} className="gap-2">
@@ -54,7 +54,7 @@ const Partner = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Benefits of Partnering With Us</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join our platform as a CA or CS professional and transform how you serve your clients through our technology-powered solutions.
+              Join our revolutionary platform as a CA or CS professional and transform how you serve your clients through our technology-powered solutions.
             </p>
           </div>
           
@@ -152,7 +152,7 @@ const Partner = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How the Partnership Works</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our platform is designed to integrate seamlessly with your practice and enhance your service delivery.
+              Our revolutionary platform is designed to integrate seamlessly with your practice and enhance your service delivery.
             </p>
           </div>
           
@@ -214,7 +214,7 @@ const Partner = () => {
             <Card>
               <CardContent className="pt-6">
                 <p className="italic text-muted-foreground mb-4">
-                  "CompliEasy has transformed how I manage my clients' compliance needs. The automated reminders and document management system have saved me countless hours of administrative work."
+                  "CompliEasy has revolutionized how I manage my clients' compliance needs. The automated reminders and document management system have saved me countless hours of administrative work."
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center font-medium text-lg">
@@ -253,7 +253,7 @@ const Partner = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Practice?</h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Join our growing network of professionals and take advantage of our technology platform to expand your practice.
+            Join our growing network of professionals and take advantage of our revolutionary platform to expand your practice.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" onClick={() => navigate('/auth?role=professional')} className="gap-2">
@@ -283,7 +283,6 @@ const Partner = () => {
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/auth')}>Onboarding</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/dashboard')}>Compliance</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/documents')}>Document Management</Button></li>
-                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/pricing')}>Pricing</Button></li>
               </ul>
             </div>
             

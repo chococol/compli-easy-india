@@ -45,7 +45,7 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-            Business Registration & Compliance Made Simple
+            Revolutionary Business Registration & Compliance Platform
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
@@ -114,7 +114,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Making an Impact on Indian Business</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our platform is helping transform India's business environment through measurable improvements.
+              Our revolutionary platform is helping transform India's business environment through measurable improvements.
             </p>
           </div>
           
@@ -202,7 +202,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Partner with Us - For CA/CS Professionals</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join our platform as a CA or CS professional and expand your practice with our technology-powered solutions.
+              Join our revolutionary platform as a CA or CS professional and expand your practice with our technology-powered solutions.
             </p>
           </div>
           
@@ -288,7 +288,6 @@ const Index = () => {
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/auth')}>Onboarding</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/dashboard')}>Compliance</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/documents')}>Document Management</Button></li>
-                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/pricing')}>Pricing</Button></li>
               </ul>
             </div>
             
