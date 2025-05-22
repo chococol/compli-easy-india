@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Mission from "./pages/Mission";
 import Contact from "./pages/Contact";
+import Partner from "./pages/Partner";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
@@ -60,6 +61,7 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/mission" element={<Mission />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/partner" element={<Partner />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/auth" element={<Auth />} />

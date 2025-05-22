@@ -1,11 +1,13 @@
+
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle, Landmark, TrendingUp, GanttChart, UserCheck } from 'lucide-react';
+import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle, Landmark, TrendingUp, GanttChart, UserCheck, Users, Handshake } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -32,137 +34,77 @@ const Index = () => {
             <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
             <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
             <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
+            <Button variant="ghost" onClick={() => navigate('/partner')}>Partner with Us</Button>
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
             <Button onClick={() => navigate('/auth')}>Get Started</Button>
           </div>
         </div>
       </header>
       
-      {/* Hero Section */}
+      {/* Hero Section - Focused on Business Users */}
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-            Revolutionizing Ease of Doing Business in India
+            Business Registration & Compliance Made Simple
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
           </p>
           
-          <Tabs defaultValue="business" className="max-w-3xl mx-auto mb-8">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-              <TabsTrigger value="business">For Businesses</TabsTrigger>
-              <TabsTrigger value="professional">For CA/CS Professionals</TabsTrigger>
-            </TabsList>
-            <TabsContent value="business" className="mt-6 text-center">
-              <p className="text-lg mb-6">A complete solution for entrepreneurs and businesses to manage compliance requirements</p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
-                  Start Your Business Journey <ArrowRight className="h-4 w-4" />
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/mission')}>
-                  Learn About Our Mission
-                </Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="professional" className="mt-6 text-center">
-              <p className="text-lg mb-6">Powerful tools for CA and CS professionals to manage multiple client businesses</p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" onClick={() => navigate('/auth?role=professional')} className="gap-2">
-                  Join as Professional <ArrowRight className="h-4 w-4" />
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/mission')}>
-                  Learn About Our Mission
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="mb-8">
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
+                Start Your Business Journey <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/mission')}>
+                Learn About Our Mission
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Business-Focused */}
       <section className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Transforming Business in India</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              CompliEasy is dedicated to improving India's business environment through innovative solutions that address key challenges faced by entrepreneurs and professionals.
+              CompliEasy is dedicated to improving India's business environment through innovative solutions that address key challenges faced by entrepreneurs.
             </p>
           </div>
           
-          <Tabs defaultValue="business" className="max-w-6xl mx-auto">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="business">Businesses</TabsTrigger>
-              <TabsTrigger value="professional">CA/CS Professionals</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="business">
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <Building className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Rapid Business Registration</h3>
-                  <p className="text-muted-foreground">
-                    Register your company in days, not months. We streamline the process across all Indian regulatory bodies.
-                  </p>
-                </div>
-                
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <GanttChart className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Simplified Compliance</h3>
-                  <p className="text-muted-foreground">
-                    Navigate India's complex regulatory landscape with ease through our automated compliance tools and expert guidance.
-                  </p>
-                </div>
-                
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <Landmark className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Government Interface</h3>
-                  <p className="text-muted-foreground">
-                    Interact seamlessly with various Indian government departments through our simplified dashboard.
-                  </p>
-                </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <Building className="h-6 w-6" />
               </div>
-            </TabsContent>
+              <h3 className="text-xl font-semibold mb-2">Rapid Business Registration</h3>
+              <p className="text-muted-foreground">
+                Register your company in days, not months. We streamline the process across all Indian regulatory bodies.
+              </p>
+            </div>
             
-            <TabsContent value="professional">
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <UserCheck className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Client Management</h3>
-                  <p className="text-muted-foreground">
-                    Manage all your clients from a single dashboard with detailed status tracking and reporting.
-                  </p>
-                </div>
-                
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <Calendar className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Deadline Tracking</h3>
-                  <p className="text-muted-foreground">
-                    Never miss important filing deadlines with automated reminders and scheduling tools.
-                  </p>
-                </div>
-                
-                <div className="bg-card p-6 rounded-lg shadow-sm">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                    <FileCheck className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Document Management</h3>
-                  <p className="text-muted-foreground">
-                    Securely store, share, and manage all client documents in one centralized system.
-                  </p>
-                </div>
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <GanttChart className="h-6 w-6" />
               </div>
-            </TabsContent>
-          </Tabs>
+              <h3 className="text-xl font-semibold mb-2">Simplified Compliance</h3>
+              <p className="text-muted-foreground">
+                Navigate India's complex regulatory landscape with ease through our automated compliance tools and expert guidance.
+              </p>
+            </div>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <Landmark className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Government Interface</h3>
+              <p className="text-muted-foreground">
+                Interact seamlessly with various Indian government departments through our simplified dashboard.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -254,21 +196,78 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section - updated for dual audience */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Transform Compliance Management?</h2>
-          <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Join thousands of entrepreneurs and professionals who are navigating India's business landscape with ease using CompliEasy.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
-              Sign Up as Business <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/auth?role=professional')} className="gap-2">
-              Sign Up as Professional <ArrowRight className="h-4 w-4" />
+      {/* Partner With Us Section - CA/CS Focused */}
+      <section className="py-20 px-4 bg-gradient-to-r from-primary/10 to-secondary/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Partner with Us - For CA/CS Professionals</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Join our platform as a CA or CS professional and expand your practice with our technology-powered solutions.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-md">
+              <CardContent className="pt-6">
+                <div className="mb-4 text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto">
+                    <Users className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-center">Expand Your Client Base</h3>
+                <p className="text-muted-foreground text-center">
+                  Get connected with businesses looking for compliance and registration services through our platform.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-0 shadow-md">
+              <CardContent className="pt-6">
+                <div className="mb-4 text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto">
+                    <Handshake className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-center">Streamlined Operations</h3>
+                <p className="text-muted-foreground text-center">
+                  Our platform automates routine tasks, allowing you to focus on value-added services for your clients.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-0 shadow-md">
+              <CardContent className="pt-6">
+                <div className="mb-4 text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-center">Grow Your Practice</h3>
+                <p className="text-muted-foreground text-center">
+                  Leverage technology to scale your services without proportionally increasing your operational costs.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button size="lg" onClick={() => navigate('/partner')} className="gap-2">
+              Learn More About Partnership <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Business CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Business Compliance?</h2>
+          <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+            Join thousands of entrepreneurs who are navigating India's business landscape with ease using CompliEasy.
+          </p>
+          <Button size="lg" onClick={() => navigate('/auth')} className="gap-2">
+            Sign Up Now <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </section>
 
@@ -299,6 +298,7 @@ const Index = () => {
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/mission')}>Our Mission</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/about')}>About Us</Button></li>
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/contact')}>Contact</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/partner')}>Partner with Us</Button></li>
               </ul>
             </div>
             
