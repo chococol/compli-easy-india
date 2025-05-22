@@ -20,8 +20,16 @@ import {
 const Navbar = () => {
   const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, userProfile } = useAuth();
   const navigate = useNavigate();
+
+  // Determine correct auth route based on user profile or default to professional
+  const getAuthRoute = () => {
+    if (userProfile?.role === 'business' || userProfile?.role === 'professional') {
+      return `/${userProfile.role === 'business' ? 'client' : 'professional'}/auth`;
+    }
+    return '/professional/auth'; // Default to professional auth
+  };
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,7 +66,10 @@ const Navbar = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                  <DropdownMenuItem onClick={() => {
+                    const route = userProfile?.role === 'business' ? '/dashboard' : '/professional/dashboard';
+                    navigate(route);
+                  }}>
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => signOut()}>
@@ -70,10 +81,10 @@ const Navbar = () => {
             </>
           ) : (
             <div className="flex gap-2">
-              <Button variant="ghost" onClick={() => navigate('/auth')}>
+              <Button variant="ghost" onClick={() => navigate(getAuthRoute())}>
                 Sign In
               </Button>
-              <Button onClick={() => navigate('/auth?mode=signup')}>
+              <Button onClick={() => navigate(`${getAuthRoute()}?mode=signup`)}>
                 Sign Up
               </Button>
             </div>

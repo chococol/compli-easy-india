@@ -19,6 +19,8 @@ import Partner from "./pages/Partner";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
+import ClientAuth from "./pages/ClientAuth";
+import ProfessionalAuth from "./pages/ProfessionalAuth";
 import ProfessionalOnboarding from "./pages/ProfessionalOnboarding";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
@@ -64,7 +66,11 @@ const App = () => {
               <Route path="/partner" element={<Partner />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/auth" element={<Auth />} />
+              
+              {/* Auth routes */}
+              <Route path="/auth" element={<Navigate to="/professional/auth" replace />} />
+              <Route path="/client/auth" element={<ClientAuth />} />
+              <Route path="/professional/auth" element={<ProfessionalAuth />} />
               
               {/* Redirect business routes to professional equivalents */}
               <Route path="/dashboard" element={<Navigate to="/professional/dashboard" replace />} />
