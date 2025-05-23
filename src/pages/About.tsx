@@ -82,12 +82,6 @@ const About = () => {
             </div>
           </CardContent>
         </Card>
-
-        <div className="text-center my-8">
-          <Link to="/pricing">
-            <Button size="lg">View Our Plans</Button>
-          </Link>
-        </div>
       </div>
 
       <footer className="mt-auto border-t py-6">
