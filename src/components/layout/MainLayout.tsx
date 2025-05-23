@@ -1,10 +1,10 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import ClientSidebar from './ClientSidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -12,10 +12,11 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
-  const { userProfile } = useAuth();
+  const location = useLocation();
   
-  // Determine which sidebar to show based on user role
-  const SidebarComponent = userProfile?.role === 'business' ? ClientSidebar : Sidebar;
+  // Determine which sidebar to show based on route path instead of user role
+  const isClientRoute = location.pathname.startsWith('/client');
+  const SidebarComponent = isClientRoute ? ClientSidebar : Sidebar;
   
   return (
     <div className="min-h-screen bg-background flex flex-col">

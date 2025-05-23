@@ -2,17 +2,17 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { MessageSquare } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const MessagesPage = () => {
-  const { userProfile } = useAuth();
-  const isClient = userProfile?.role === 'business';
+  const location = useLocation();
+  const isClientRoute = location.pathname.startsWith('/client');
   
-  const messageDescription = isClient 
+  const messageDescription = isClientRoute
     ? "View and manage your messages with your professional advisor."
     : "View and manage your messages with clients.";
     
-  const emptyStateMessage = isClient
+  const emptyStateMessage = isClientRoute
     ? "When your professional advisor sends you a message, it will appear here."
     : "When you receive messages from clients, they will appear here.";
   

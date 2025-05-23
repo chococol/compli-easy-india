@@ -2,17 +2,17 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { CreditCard } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const PaymentsPage = () => {
-  const { userProfile } = useAuth();
-  const isClient = userProfile?.role === 'business';
+  const location = useLocation();
+  const isClientRoute = location.pathname.startsWith('/client');
   
-  const paymentDescription = isClient 
+  const paymentDescription = isClientRoute
     ? "View your payment history and invoices."
     : "View and manage client payment history and invoices.";
     
-  const emptyStateMessage = isClient
+  const emptyStateMessage = isClientRoute
     ? "When you receive invoices or make payments, they will appear here."
     : "When you create invoices or receive payments, they will appear here.";
   

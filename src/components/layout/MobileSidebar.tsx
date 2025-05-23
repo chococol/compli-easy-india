@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, 
   Building,
@@ -18,7 +18,6 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileSidebarProps {
   open: boolean;
@@ -43,9 +42,12 @@ const clientNavItems = [
 ];
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
-  const { userProfile } = useAuth();
-  const navItems = userProfile?.role === 'business' ? clientNavItems : professionalNavItems;
-  const helpText = userProfile?.role === 'business' 
+  const location = useLocation();
+  const isClientRoute = location.pathname.startsWith('/client');
+  
+  // Choose navigation items based on route path
+  const navItems = isClientRoute ? clientNavItems : professionalNavItems;
+  const helpText = isClientRoute
     ? "Contact your professional for assistance."
     : "Contact your administrator or our support team.";
 
