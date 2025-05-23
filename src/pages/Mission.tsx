@@ -119,12 +119,6 @@ const Mission = () => {
             </div>
           </CardContent>
         </Card>
-
-        <div className="text-center my-6 md:my-8">
-          <Link to="/pricing">
-            <Button size="lg" className="w-full sm:w-auto">View Our Plans</Button>
-          </Link>
-        </div>
       </div>
 
       <footer className="mt-auto border-t py-4 md:py-6">
