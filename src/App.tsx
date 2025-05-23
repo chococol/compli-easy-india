@@ -74,69 +74,73 @@ const App = () => {
               <Route path="/client/auth" element={<ClientAuth />} />
               <Route path="/professional/auth" element={<ProfessionalAuth />} />
               
+              {/* Legacy routes - redirect to new client paths */}
+              <Route path="/dashboard" element={<Navigate to="/client/dashboard" replace />} />
+              <Route path="/documents" element={<Navigate to="/client/documents" replace />} />
+              <Route path="/tasks" element={<Navigate to="/client/tasks" replace />} />
+              <Route path="/payments" element={<Navigate to="/client/payments" replace />} />
+              <Route path="/messages" element={<Navigate to="/client/messages" replace />} />
+              <Route path="/settings" element={<Navigate to="/client/settings" replace />} />
+              
               {/* Client onboarding */}
               <Route path="/client/onboarding" element={<ClientOnboarding />} />
               
-              {/* Client dashboard route - not redirected anymore */}
-              <Route path="/dashboard" element={
+              {/* Client routes with /client prefix */}
+              <Route path="/client/dashboard" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <Dashboard />
                 </ProtectedRoute>
               } />
-              
-              {/* Professional onboarding */}
-              <Route path="/onboarding" element={<Onboarding />} />
-              
-              {/* Client routes */}
-              <Route path="/tasks" element={
+              <Route path="/client/tasks" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <TasksPage />
                 </ProtectedRoute>
               } />
-              <Route path="/documents" element={
+              <Route path="/client/documents" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <DocumentsPage />
                 </ProtectedRoute>
               } />
-              <Route path="/documents/upload" element={
+              <Route path="/client/documents/upload" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <DocumentUploadPage />
                 </ProtectedRoute>
               } />
-              <Route path="/documents/:id" element={
+              <Route path="/client/documents/:id" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <DocumentViewPage />
                 </ProtectedRoute>
               } />
-              <Route path="/payments" element={
+              <Route path="/client/payments" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <PaymentsPage />
                 </ProtectedRoute>
               } />
-              <Route path="/messages" element={
+              <Route path="/client/messages" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <MessagesPage />
                 </ProtectedRoute>
               } />
-              <Route path="/settings" element={
+              <Route path="/client/settings" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <SettingsPage />
                 </ProtectedRoute>
               } />
               
-              {/* Professional user routes */}
+              {/* Professional onboarding */}
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/professional/onboarding" element={
                 <ProfessionalProtectedRoute requiresOnboarding={false}>
                   <ProfessionalOnboarding />
                 </ProfessionalProtectedRoute>
               } />
+              
+              {/* Professional routes */}
               <Route path="/professional/dashboard" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <ProfessionalDashboard />
                 </ProfessionalProtectedRoute>
               } />
-              
-              {/* Professional routes */}
               <Route path="/professional/companies" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <CompaniesPage />
@@ -162,8 +166,13 @@ const App = () => {
                   <MessagesPage />
                 </ProfessionalProtectedRoute>
               } />
+              <Route path="/professional/settings" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <SettingsPage />
+                </ProfessionalProtectedRoute>
+              } />
               
-              {/* Legacy routes - kept for compatibility */}
+              {/* Legacy professional routes - kept for compatibility */}
               <Route path="/professional/clients/:clientId" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <ClientDetailsPage />

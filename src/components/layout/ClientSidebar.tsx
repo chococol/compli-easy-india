@@ -11,12 +11,12 @@ import {
 } from 'lucide-react';
 
 const clientNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
-  { icon: CreditCard, label: 'Payments', path: '/payments' },
-  { icon: MessageSquare, label: 'Messages', path: '/messages' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
+  { icon: Home, label: 'Dashboard', path: '/client/dashboard' },
+  { icon: FileText, label: 'Documents', path: '/client/documents' },
+  { icon: ClipboardList, label: 'Tasks', path: '/client/tasks' },
+  { icon: CreditCard, label: 'Payments', path: '/client/payments' },
+  { icon: MessageSquare, label: 'Messages', path: '/client/messages' },
+  { icon: Settings, label: 'Settings', path: '/client/settings' },
 ];
 
 const ClientSidebar = () => {

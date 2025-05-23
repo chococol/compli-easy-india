@@ -1,6 +1,7 @@
 
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
+import { MessageSquare } from 'lucide-react';
 
 const MessagesPage = () => {
   return (
@@ -16,7 +17,7 @@ const MessagesPage = () => {
         <div className="bg-card p-6 rounded-lg shadow-sm border">
           <div className="text-center py-8">
             <div className="mx-auto h-16 w-16 text-muted-foreground opacity-25 mb-4">
-              <MessageIcon size={64} />
+              <MessageSquare size={64} />
             </div>
             <h3 className="text-lg font-medium mb-2">No messages yet</h3>
             <p className="text-muted-foreground">
@@ -28,21 +29,5 @@ const MessagesPage = () => {
     </MainLayout>
   );
 };
-
-const MessageIcon = ({ size = 24 }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-  >
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-  </svg>
-);
 
 export default MessagesPage;
