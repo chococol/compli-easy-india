@@ -30,6 +30,7 @@ import CompaniesPage from "./pages/CompaniesPage";
 import CompanyDetailsPage from "./pages/CompanyDetailsPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import MessagesPage from "./pages/MessagesPage";
+import SettingsPage from "./pages/SettingsPage";
 import AddClientPage from "./pages/AddClientPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -105,6 +106,21 @@ const App = () => {
               <Route path="/documents/:id" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <DocumentViewPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/payments" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <PaymentsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/messages" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <MessagesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <SettingsPage />
                 </ProtectedRoute>
               } />
               
