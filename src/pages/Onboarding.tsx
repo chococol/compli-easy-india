@@ -16,9 +16,13 @@ const Onboarding = () => {
       return;
     }
     
-    // If onboarding is already complete, redirect to dashboard
+    // If onboarding is already complete, redirect to appropriate dashboard based on role
     if (isOnboardingComplete) {
-      navigate('/dashboard');
+      if (userProfile?.role === 'business') {
+        navigate('/dashboard');
+      } else {
+        navigate('/professional/dashboard');
+      }
     }
   }, [isOnboardingComplete, userProfile, navigate]);
 

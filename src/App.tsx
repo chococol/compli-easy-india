@@ -76,11 +76,17 @@ const App = () => {
               {/* Client onboarding */}
               <Route path="/client/onboarding" element={<ClientOnboarding />} />
               
-              {/* Redirect business routes to professional equivalents */}
-              <Route path="/dashboard" element={<Navigate to="/professional/dashboard" replace />} />
-              <Route path="/onboarding" element={<Navigate to="/professional/onboarding" replace />} />
+              {/* Client dashboard route - not redirected anymore */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
               
-              {/* Keep these routes but they'll likely not be accessed due to redirects */}
+              {/* Professional onboarding */}
+              <Route path="/onboarding" element={<Onboarding />} />
+              
+              {/* Client routes */}
               <Route path="/tasks" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <TasksPage />
@@ -114,7 +120,7 @@ const App = () => {
                 </ProfessionalProtectedRoute>
               } />
               
-              {/* New Professional Routes */}
+              {/* Professional routes */}
               <Route path="/professional/companies" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <CompaniesPage />

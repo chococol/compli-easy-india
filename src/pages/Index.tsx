@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, FileCheck, Shield, Building, Layers, CheckCircle, Landmark, TrendingUp, GanttChart, UserCheck, Users, Handshake } from 'lucide-react';
@@ -16,7 +17,10 @@ const Index = () => {
     if (user) {
       if (userProfile?.role === 'professional') {
         navigate('/professional/dashboard');
+      } else if (userProfile?.role === 'business') {
+        navigate('/dashboard');
       } else {
+        // Default to dashboard if role is not specified
         navigate('/dashboard');
       }
     }
