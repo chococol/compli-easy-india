@@ -10,7 +10,7 @@ const MessagesPage = () => {
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Messages</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage your messages with your professional advisor.
+            View and manage your messages with clients or your professional advisor.
           </p>
         </header>
         
@@ -21,7 +21,7 @@ const MessagesPage = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">No messages yet</h3>
             <p className="text-muted-foreground">
-              When your professional advisor sends you a message, it will appear here.
+              When you receive messages, they will appear here.
             </p>
           </div>
         </div>
