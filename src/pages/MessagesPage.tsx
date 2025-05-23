@@ -2,15 +2,27 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { MessageSquare } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MessagesPage = () => {
+  const { userProfile } = useAuth();
+  const isClient = userProfile?.role === 'business';
+  
+  const messageDescription = isClient 
+    ? "View and manage your messages with your professional advisor."
+    : "View and manage your messages with clients.";
+    
+  const emptyStateMessage = isClient
+    ? "When your professional advisor sends you a message, it will appear here."
+    : "When you receive messages from clients, they will appear here.";
+  
   return (
     <MainLayout>
       <div className="space-y-6">
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Messages</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage your messages with clients or your professional advisor.
+            {messageDescription}
           </p>
         </header>
         
@@ -21,7 +33,7 @@ const MessagesPage = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">No messages yet</h3>
             <p className="text-muted-foreground">
-              When you receive messages, they will appear here.
+              {emptyStateMessage}
             </p>
           </div>
         </div>

@@ -4,6 +4,8 @@ import { NavLink } from 'react-router-dom';
 import { 
   Home, 
   Building,
+  FileText,
+  ClipboardList,
   MessageSquare, 
   CreditCard, 
   Settings
@@ -16,6 +18,7 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileSidebarProps {
   open: boolean;
@@ -30,7 +33,22 @@ const professionalNavItems = [
   { icon: Settings, label: 'Settings', path: '/professional/settings' },
 ];
 
+const clientNavItems = [
+  { icon: Home, label: 'Dashboard', path: '/client/dashboard' },
+  { icon: FileText, label: 'Documents', path: '/client/documents' },
+  { icon: ClipboardList, label: 'Tasks', path: '/client/tasks' },
+  { icon: CreditCard, label: 'Payments', path: '/client/payments' },
+  { icon: MessageSquare, label: 'Messages', path: '/client/messages' },
+  { icon: Settings, label: 'Settings', path: '/client/settings' },
+];
+
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
+  const { userProfile } = useAuth();
+  const navItems = userProfile?.role === 'business' ? clientNavItems : professionalNavItems;
+  const helpText = userProfile?.role === 'business' 
+    ? "Contact your professional for assistance."
+    : "Contact your administrator or our support team.";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="p-0 w-[280px]">
@@ -42,7 +60,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
         
         <div className="overflow-y-auto py-2">
           <nav className="space-y-1 px-2">
-            {professionalNavItems.map((item) => (
+            {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -66,7 +84,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
           <div className="text-sm">
             <div className="font-medium">Need help?</div>
             <div className="text-muted-foreground mt-1">
-              Contact your administrator or our support team.
+              {helpText}
             </div>
           </div>
         </SheetFooter>

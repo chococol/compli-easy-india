@@ -2,15 +2,27 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { CreditCard } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const PaymentsPage = () => {
+  const { userProfile } = useAuth();
+  const isClient = userProfile?.role === 'business';
+  
+  const paymentDescription = isClient 
+    ? "View your payment history and invoices."
+    : "View and manage client payment history and invoices.";
+    
+  const emptyStateMessage = isClient
+    ? "When you receive invoices or make payments, they will appear here."
+    : "When you create invoices or receive payments, they will appear here.";
+  
   return (
     <MainLayout>
       <div className="space-y-6">
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Payments</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage your payment history and invoices.
+            {paymentDescription}
           </p>
         </header>
         
@@ -21,7 +33,7 @@ const PaymentsPage = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">No payment history yet</h3>
             <p className="text-muted-foreground">
-              When you make or receive payments, they will appear here.
+              {emptyStateMessage}
             </p>
           </div>
         </div>
