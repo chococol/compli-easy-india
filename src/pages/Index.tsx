@@ -42,10 +42,10 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-            Revolutionary Business Registration & Compliance Platform
+            Revolutionizing Ease of Doing Business in India
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Your all-in-one platform that revolutionizes the ease of doing business in India through simplified registration, streamlined compliance, and breaking down regulatory barriers.
+            Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
           </p>
           
           <div className="mb-8">
