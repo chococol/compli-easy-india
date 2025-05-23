@@ -32,6 +32,7 @@ import PaymentsPage from "./pages/PaymentsPage";
 import MessagesPage from "./pages/MessagesPage";
 import SettingsPage from "./pages/SettingsPage";
 import AddClientPage from "./pages/AddClientPage";
+import ClientCompanyPage from "./pages/ClientCompanyPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfessionalProtectedRoute from "./components/ProfessionalProtectedRoute";
@@ -89,6 +90,11 @@ const App = () => {
               <Route path="/client/dashboard" element={
                 <ProtectedRoute requiresOnboarding={true}>
                   <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/client/company" element={
+                <ProtectedRoute requiresOnboarding={true}>
+                  <ClientCompanyPage />
                 </ProtectedRoute>
               } />
               <Route path="/client/tasks" element={

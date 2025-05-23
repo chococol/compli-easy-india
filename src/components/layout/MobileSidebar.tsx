@@ -34,6 +34,7 @@ const professionalNavItems = [
 
 const clientNavItems = [
   { icon: Home, label: 'Dashboard', path: '/client/dashboard' },
+  { icon: Building, label: 'My Company', path: '/client/company' },
   { icon: FileText, label: 'Documents', path: '/client/documents' },
   { icon: ClipboardList, label: 'Tasks', path: '/client/tasks' },
   { icon: CreditCard, label: 'Payments', path: '/client/payments' },
