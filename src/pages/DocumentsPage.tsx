@@ -9,14 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Upload, FileText, Download, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDocuments, documentCategories, Document } from '@/hooks/useDocuments';
-import { useAuth } from '@/contexts/AuthContext';
 
 const DocumentsPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const { documents, loading, downloadDocument, viewDocument } = useDocuments();
   const [activeCategory, setActiveCategory] = useState('All Documents');
-  const { user } = useAuth();
   
   // Filter documents based on search query and active category
   const filteredDocuments = documents.filter((doc) => {
@@ -36,12 +34,6 @@ const DocumentsPage = () => {
   const handleDownloadDocument = (documentId: string) => {
     downloadDocument(documentId);
   };
-  
-  // If user is not logged in, redirect to auth page
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
   
   return (
     <MainLayout>

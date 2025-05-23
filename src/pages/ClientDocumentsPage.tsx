@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import DocumentUpload from '@/components/documents/DocumentUpload';
 import DocumentsList, { Document } from '@/components/documents/DocumentsList';
 import DocumentRequest from '@/components/documents/DocumentRequest';
@@ -51,7 +50,6 @@ const dummyDocuments = [
 const ClientDocumentsPage = () => {
   const { clientId } = useParams();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [documents, setDocuments] = useState<Document[]>(dummyDocuments);
   const [isLoading, setIsLoading] = useState(false);
   const [clientName, setClientName] = useState('ABC Corporation');
