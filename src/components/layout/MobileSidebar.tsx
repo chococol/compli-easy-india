@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   Building,
@@ -8,9 +8,12 @@ import {
   ClipboardList,
   MessageSquare, 
   CreditCard, 
-  Settings
+  Settings,
+  ArrowLeft,
+  User
 } from 'lucide-react';
 import Logo from '../Logo';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -33,22 +36,44 @@ const professionalNavItems = [
 ];
 
 const clientNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/client/dashboard' },
-  { icon: Building, label: 'My Company', path: '/client/company' },
-  { icon: FileText, label: 'Documents', path: '/client/documents' },
-  { icon: ClipboardList, label: 'Tasks', path: '/client/tasks' },
-  { icon: CreditCard, label: 'Payments', path: '/client/payments' },
-  { icon: MessageSquare, label: 'Messages', path: '/client/messages' },
-  { icon: Settings, label: 'Settings', path: '/client/settings' },
+  { icon: Home, label: 'Dashboard', path: '/dashboard' },
+  { icon: Building, label: 'My Company', path: '/company' },
+  { icon: FileText, label: 'Documents', path: '/documents' },
+  { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
+  { icon: CreditCard, label: 'Payments', path: '/payments' },
+  { icon: MessageSquare, label: 'Messages', path: '/messages' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
   const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+  
   const isClientRoute = location.pathname.startsWith('/client');
+  const isProfessionalView = location.pathname.startsWith('/professional/view-client/');
+  const clientId = params.clientId;
   
   // Choose navigation items based on route path
-  const navItems = isClientRoute ? clientNavItems : professionalNavItems;
-  const helpText = isClientRoute
+  const navItems = (isClientRoute || isProfessionalView) ? clientNavItems : professionalNavItems;
+  
+  const getNavPath = (basePath: string) => {
+    if (isProfessionalView && clientId) {
+      return `/professional/view-client/${clientId}${basePath}`;
+    } else if (isClientRoute || isProfessionalView) {
+      return `/client${basePath}`;
+    }
+    return basePath;
+  };
+  
+  const handleBackToProfessional = () => {
+    navigate('/professional/dashboard');
+    onOpenChange(false);
+  };
+  
+  const helpText = isProfessionalView
+    ? "You're viewing this client's dashboard as a professional."
+    : isClientRoute 
     ? "Contact your professional for assistance."
     : "Contact your administrator or our support team.";
 
@@ -62,11 +87,29 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
         </SheetHeader>
         
         <div className="overflow-y-auto py-2">
+          {isProfessionalView && (
+            <div className="mx-2 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-600">Viewing Client Dashboard</span>
+              </div>
+              <Button 
+                onClick={handleBackToProfessional}
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to My Dashboard
+              </Button>
+            </div>
+          )}
+          
           <nav className="space-y-1 px-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
-                to={item.path}
+                to={getNavPath(item.path)}
                 className={({ isActive }) => 
                   `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
                     isActive 

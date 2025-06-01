@@ -2,13 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
-import { Users, FileCheck, AlertTriangle, UserPlus, Clock } from 'lucide-react';
+import { Users, FileCheck, AlertTriangle, UserPlus, Clock, Building, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import ProfessionalClientsList from '@/components/professional/ProfessionalClientsList';
 import { useNavigate } from 'react-router-dom';
 
 type ClientSummary = {
@@ -20,23 +19,12 @@ type ClientSummary = {
   lastActivity: string;
 };
 
-type DeadlineType = {
-  id: string;
-  clientName: string;
-  clientId: string;
-  filingType: string;
-  dueDate: string;
-  status: 'pending' | 'in-progress' | 'completed' | 'not-started';
-};
-
 const ProfessionalDashboard = () => {
   const { userProfile, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [clients, setClients] = useState<ClientSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deadlines, setDeadlines] = useState<DeadlineType[]>([]);
-  const [deadlinesLoading, setDeadlinesLoading] = useState(true);
   
   useEffect(() => {
     const fetchClients = async () => {
@@ -94,74 +82,14 @@ const ProfessionalDashboard = () => {
           description: error.message,
           variant: 'destructive',
         });
-        // Set empty data to prevent loading indicator from showing indefinitely
         setClients([]);
       } finally {
         setIsLoading(false);
       }
     };
     
-    const fetchDeadlines = async () => {
-      if (!user) return;
-      
-      setDeadlinesLoading(true);
-      
-      try {
-        // Fetch upcoming deadlines
-        const { data: deadlinesData, error: deadlinesError } = await supabase
-          .from('compliance_deadlines')
-          .select('id, title, due_date, status, client_id')
-          .eq('professional_id', user.id)
-          .gte('due_date', new Date().toISOString())
-          .order('due_date', { ascending: true })
-          .limit(5);
-          
-        if (deadlinesError) throw deadlinesError;
-        
-        // If we have deadlines, fetch client details
-        if (deadlinesData && deadlinesData.length > 0) {
-          const clientIds = deadlinesData.map(deadline => deadline.client_id);
-          
-          const { data: clientsData, error: clientsError } = await supabase
-            .from('clients')
-            .select('id, name')
-            .in('id', clientIds);
-            
-          if (clientsError) throw clientsError;
-          
-          // Map client names to deadlines
-          const deadlinesWithClientNames: DeadlineType[] = deadlinesData.map(deadline => {
-            const client = clientsData?.find(c => c.id === deadline.client_id);
-            return {
-              id: deadline.id,
-              clientName: client?.name || 'Unknown Client',
-              clientId: deadline.client_id,
-              filingType: deadline.title,
-              dueDate: deadline.due_date,
-              status: deadline.status || 'pending',
-            };
-          });
-          
-          setDeadlines(deadlinesWithClientNames);
-        } else {
-          setDeadlines([]);
-        }
-      } catch (error: any) {
-        console.error('Error fetching deadlines:', error);
-        toast({
-          title: 'Failed to load deadlines',
-          description: error.message,
-          variant: 'destructive',
-        });
-        setDeadlines([]);
-      } finally {
-        setDeadlinesLoading(false);
-      }
-    };
-    
     if (user) {
       fetchClients();
-      fetchDeadlines();
     }
   }, [user, toast]);
   
@@ -174,6 +102,23 @@ const ProfessionalDashboard = () => {
     navigate('/professional/clients/add');
   };
   
+  const viewClientDashboard = (clientId: string) => {
+    navigate(`/professional/view-client/${clientId}/dashboard`);
+  };
+  
+  const getRiskBadgeClass = (risk: string) => {
+    switch(risk) {
+      case 'low':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'high':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    }
+  };
+  
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -181,7 +126,7 @@ const ProfessionalDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Professional Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              Welcome {userProfile?.professionalType} professional! Manage your clients' compliance here.
+              Welcome {userProfile?.professionalType} professional! Select a company to view their dashboard.
             </p>
           </div>
           <Button onClick={addNewClient} className="shrink-0">
@@ -214,128 +159,88 @@ const ProfessionalDashboard = () => {
         </div>
         
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Upcoming Filing Deadlines</CardTitle>
-              <CardDescription>Critical compliance dates for your clients</CardDescription>
-            </div>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building className="h-5 w-5" />
+              Your Companies
+            </CardTitle>
+            <CardDescription>Click on any company to view their complete dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <DeadlineTable deadlines={deadlines} isLoading={deadlinesLoading} />
+            {isLoading ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="p-4 border rounded-lg animate-pulse">
+                    <div className="h-6 bg-muted rounded mb-2"></div>
+                    <div className="h-4 bg-muted rounded mb-2"></div>
+                    <div className="h-4 bg-muted rounded"></div>
+                  </div>
+                ))}
+              </div>
+            ) : clients.length === 0 ? (
+              <div className="text-center py-8">
+                <Building className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No companies yet</h3>
+                <p className="text-muted-foreground mb-4">Add your first client to get started</p>
+                <Button onClick={addNewClient}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add Your First Client
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {clients.map(client => (
+                  <Card key={client.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center justify-between text-lg">
+                        <span className="truncate">{client.businessName}</span>
+                        <span className={`${getRiskBadgeClass(client.riskLevel)} rounded px-2 py-1 text-xs font-medium capitalize`}>
+                          {client.riskLevel}
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Compliance Tasks</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{client.pendingCompliance}/{client.totalCompliance}</span>
+                            <div className="h-2 w-16 bg-muted overflow-hidden rounded-full">
+                              <div 
+                                className="h-full bg-primary" 
+                                style={{ 
+                                  width: client.totalCompliance > 0 
+                                    ? `${((client.totalCompliance - client.pendingCompliance) / client.totalCompliance) * 100}%` 
+                                    : '0%' 
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Last Activity</span>
+                          <span>{new Date(client.lastActivity).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <Button 
+                          onClick={() => viewClientDashboard(client.id)}
+                          className="w-full mt-4"
+                          variant="outline"
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Dashboard
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
-        
-        <ProfessionalClientsList clients={clients} isLoading={isLoading} />
       </div>
     </MainLayout>
-  );
-};
-
-interface DeadlineTableProps {
-  deadlines: DeadlineType[];
-  isLoading: boolean;
-}
-
-const DeadlineTable: React.FC<DeadlineTableProps> = ({ deadlines, isLoading }) => {
-  const navigate = useNavigate();
-  
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center">
-          <div className="w-1/4"><div className="h-6 w-24 bg-muted animate-pulse rounded"></div></div>
-          <div className="w-1/4"><div className="h-6 w-32 bg-muted animate-pulse rounded"></div></div>
-          <div className="w-1/4"><div className="h-6 w-24 bg-muted animate-pulse rounded"></div></div>
-          <div className="w-1/4"><div className="h-6 w-16 bg-muted animate-pulse rounded"></div></div>
-        </div>
-        {[1, 2, 3].map(i => (
-          <div key={i} className="flex items-center">
-            <div className="w-1/4"><div className="h-6 w-28 bg-muted animate-pulse rounded"></div></div>
-            <div className="w-1/4"><div className="h-6 w-36 bg-muted animate-pulse rounded"></div></div>
-            <div className="w-1/4"><div className="h-6 w-28 bg-muted animate-pulse rounded"></div></div>
-            <div className="w-1/4"><div className="h-6 w-20 bg-muted animate-pulse rounded"></div></div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  
-  if (deadlines.length === 0) {
-    return (
-      <div className="text-center py-6">
-        <p className="text-muted-foreground">No upcoming deadlines</p>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left py-3 px-2">Client</th>
-            <th className="text-left py-3 px-2">Filing Type</th>
-            <th className="text-left py-3 px-2">Due Date</th>
-            <th className="text-left py-3 px-2">Status</th>
-            <th className="text-right py-3 px-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {deadlines.map(deadline => (
-            <tr key={deadline.id} className="border-b hover:bg-muted/50">
-              <td className="py-3 px-2">{deadline.clientName}</td>
-              <td className="py-3 px-2">{deadline.filingType}</td>
-              <td className="py-3 px-2">{new Date(deadline.dueDate).toLocaleDateString()}</td>
-              <td className="py-3 px-2">
-                <StatusBadge status={deadline.status} />
-              </td>
-              <td className="py-3 px-2 text-right">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate(`/professional/clients/${deadline.clientId}`)}
-                >
-                  View Details
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  let badgeClass = '';
-  let label = '';
-  
-  switch(status) {
-    case 'pending':
-      badgeClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      label = 'Pending';
-      break;
-    case 'in-progress':
-      badgeClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      label = 'In Progress';
-      break;
-    case 'completed':
-      badgeClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      label = 'Completed';
-      break;
-    case 'not-started':
-      badgeClass = 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-      label = 'Not Started';
-      break;
-    default:
-      badgeClass = 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-      label = status;
-  }
-  
-  return (
-    <span className={`${badgeClass} rounded px-2 py-1 text-xs font-medium`}>
-      {label}
-    </span>
   );
 };
 

@@ -147,6 +147,54 @@ const App = () => {
                   <ProfessionalDashboard />
                 </ProfessionalProtectedRoute>
               } />
+              
+              {/* Professional viewing client dashboards */}
+              <Route path="/professional/view-client/:clientId/dashboard" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <Dashboard />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/company" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <ClientCompanyPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/tasks" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <TasksPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/documents" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <DocumentsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/documents/upload" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <DocumentUploadPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/documents/:id" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <DocumentViewPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/payments" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <PaymentsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/messages" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <MessagesPage />
+                </ProfessionalProtectedRoute>
+              } />
+              <Route path="/professional/view-client/:clientId/settings" element={
+                <ProfessionalProtectedRoute requiresOnboarding={true}>
+                  <SettingsPage />
+                </ProfessionalProtectedRoute>
+              } />
+              
               <Route path="/professional/companies" element={
                 <ProfessionalProtectedRoute requiresOnboarding={true}>
                   <CompaniesPage />
