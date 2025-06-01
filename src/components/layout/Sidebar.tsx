@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 const professionalNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
+  { icon: Home, label: 'Home', path: '/professional/home' },
   { icon: Building, label: 'Companies', path: '/professional/companies' },
   { icon: CreditCard, label: 'Payments', path: '/professional/payments' },
   { icon: MessageSquare, label: 'Messages', path: '/professional/messages' },
@@ -19,7 +19,7 @@ const professionalNavItems = [
 
 const Sidebar = () => {
   return (
-    <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
+    <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto fixed">
       <nav className="space-y-1 mt-2">
         {professionalNavItems.map((item) => (
           <NavLink

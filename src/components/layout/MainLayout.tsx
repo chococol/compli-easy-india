@@ -27,7 +27,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Navbar />
       <div className="flex-1 flex">
         {!isMobile && <SidebarComponent />}
-        <main className="flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full">
+        <main className={`flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full ${!isMobile ? 'ml-64' : ''}`}>
           {children}
         </main>
       </div>

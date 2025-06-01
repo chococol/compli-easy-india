@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
@@ -57,7 +56,7 @@ const ProfessionalDashboard = () => {
   };
   
   const viewClientDashboard = (clientId: string) => {
-    navigate(`/professional/${clientId}/dashboard`);
+    navigate(`/professional/${clientId}/home`);
   };
   
   const getRiskBadgeClass = (risk: string) => {
@@ -78,9 +77,9 @@ const ProfessionalDashboard = () => {
       <div className="space-y-6">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Professional Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Professional Home</h1>
             <p className="text-muted-foreground mt-1">
-              Welcome! Select a company to view their complete dashboard.
+              Welcome! Select a company to view their complete data.
             </p>
           </div>
           <Button onClick={addNewClient} className="shrink-0">
@@ -117,7 +116,7 @@ const ProfessionalDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Your Companies</h2>
-              <p className="text-muted-foreground">Click on any company to view their complete dashboard</p>
+              <p className="text-muted-foreground">Click on any company to view their complete data</p>
             </div>
           </div>
           
@@ -172,7 +171,7 @@ const ProfessionalDashboard = () => {
                       size="lg"
                     >
                       <Eye className="mr-2 h-4 w-4" />
-                      View Client Dashboard
+                      View Client Data
                     </Button>
                   </div>
                 </CardContent>

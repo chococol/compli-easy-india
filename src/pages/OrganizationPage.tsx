@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building, Users, User, Crown, MapPin } from 'lucide-react';
+import { Building, Users, User, Crown, TrendingUp } from 'lucide-react';
 import CompanyDetailsSection from '@/components/company/CompanyDetailsSection';
 import DirectorsSection from '@/components/company/DirectorsSection';
 import ShareholdersSection from '@/components/company/ShareholdersSection';
-import AccountantFirmSection from '@/components/company/AccountantFirmSection';
 
 // Dummy data for company details
 const dummyCompanyData = {
@@ -113,44 +112,6 @@ const dummyShareholders = [
   }
 ];
 
-// Dummy data for accountant firm
-const dummyAccountantFirm = {
-  name: 'Johnson & Associates',
-  address: '456 Accounting Avenue, Financial District, 56789',
-  contactPerson: 'Robert Johnson',
-  email: 'rjohnson@johnsonassociates.example.com',
-  phone: '+1 (555) 987-6543',
-  website: 'https://johnsonassociates.example.com',
-  clientSince: '2020-05-20',
-  services: [
-    'Tax Preparation',
-    'Financial Audits',
-    'Bookkeeping',
-    'Financial Advisory',
-    'Compliance Management'
-  ],
-  teamMembers: [
-    {
-      name: 'Robert Johnson',
-      position: 'Lead Accountant',
-      email: 'rjohnson@johnsonassociates.example.com',
-      phone: '+1 (555) 987-6543'
-    },
-    {
-      name: 'Sarah Williams',
-      position: 'Tax Specialist',
-      email: 'swilliams@johnsonassociates.example.com',
-      phone: '+1 (555) 876-5432'
-    },
-    {
-      name: 'David Thompson',
-      position: 'Audit Manager',
-      email: 'dthompson@johnsonassociates.example.com',
-      phone: '+1 (555) 765-4321'
-    }
-  ]
-};
-
 const OrganizationPage = () => {
   const [activeTab, setActiveTab] = useState('organization');
 
@@ -160,31 +121,27 @@ const OrganizationPage = () => {
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Organization</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your organization structure and information
+            Manage your entity structure and information
           </p>
         </header>
 
         <Tabs defaultValue="organization" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 md:w-[700px]">
+          <TabsList className="grid grid-cols-4 md:w-[600px]">
             <TabsTrigger value="organization" className="flex items-center gap-2">
               <Building className="h-4 w-4" />
-              <span className="hidden sm:inline">Organization</span>
+              <span className="hidden sm:inline">Entity Info</span>
             </TabsTrigger>
-            <TabsTrigger value="management" className="flex items-center gap-2">
+            <TabsTrigger value="associates" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Management</span>
+              <span className="hidden sm:inline">Associates</span>
             </TabsTrigger>
-            <TabsTrigger value="shareholders" className="flex items-center gap-2">
+            <TabsTrigger value="stakeholders" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Shareholders</span>
+              <span className="hidden sm:inline">Stakeholders</span>
             </TabsTrigger>
-            <TabsTrigger value="ownerships" className="flex items-center gap-2">
-              <Crown className="h-4 w-4" />
-              <span className="hidden sm:inline">Ownerships</span>
-            </TabsTrigger>
-            <TabsTrigger value="professional" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Professional</span>
+            <TabsTrigger value="assets" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              <span className="hidden sm:inline">Assets</span>
             </TabsTrigger>
           </TabsList>
           
@@ -192,20 +149,16 @@ const OrganizationPage = () => {
             <CompanyDetailsSection company={dummyCompanyData} />
           </TabsContent>
           
-          <TabsContent value="management" className="mt-6">
+          <TabsContent value="associates" className="mt-6">
             <DirectorsSection directors={dummyDirectors} />
           </TabsContent>
           
-          <TabsContent value="shareholders" className="mt-6">
+          <TabsContent value="stakeholders" className="mt-6">
             <ShareholdersSection shareholders={dummyShareholders} />
           </TabsContent>
           
-          <TabsContent value="ownerships" className="mt-6">
-            <OwnershipsSection />
-          </TabsContent>
-          
-          <TabsContent value="professional" className="mt-6">
-            <AccountantFirmSection firm={dummyAccountantFirm} />
+          <TabsContent value="assets" className="mt-6">
+            <AssetsSection />
           </TabsContent>
         </Tabs>
       </div>
@@ -213,11 +166,11 @@ const OrganizationPage = () => {
   );
 };
 
-const OwnershipsSection = () => {
-  const dummyOwnerships = [
+const AssetsSection = () => {
+  const dummyAssets = [
     {
       id: '1',
-      type: 'Subsidiary Company',
+      type: 'Subsidiary Entity',
       name: 'ABC Tech Solutions Pvt Ltd',
       ownership: '75%',
       location: 'Mumbai, Maharashtra',
@@ -248,43 +201,43 @@ const OwnershipsSection = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Ownership Portfolio</CardTitle>
+          <CardTitle>Asset Portfolio</CardTitle>
           <CardDescription>
             Assets, subsidiaries, and properties owned by your organization
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
-            {dummyOwnerships.map((ownership) => (
-              <Card key={ownership.id} className="p-4">
+            {dummyAssets.map((asset) => (
+              <Card key={asset.id} className="p-4">
                 <div className="flex justify-between items-start">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-lg">{ownership.name}</span>
+                      <span className="font-semibold text-lg">{asset.name}</span>
                       <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">
-                        {ownership.type}
+                        {asset.type}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
                       <div>
                         <span className="font-medium">Ownership:</span>
                         <br />
-                        {ownership.ownership}
+                        {asset.ownership}
                       </div>
                       <div>
                         <span className="font-medium">Location:</span>
                         <br />
-                        {ownership.location}
+                        {asset.location}
                       </div>
                       <div>
                         <span className="font-medium">Acquired:</span>
                         <br />
-                        {ownership.acquiredDate}
+                        {asset.acquiredDate}
                       </div>
                       <div>
                         <span className="font-medium">Value:</span>
                         <br />
-                        {ownership.value}
+                        {asset.value}
                       </div>
                     </div>
                   </div>

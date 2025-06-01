@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { User, Users, Key, Wrench, HelpCircle, Link } from 'lucide-react';
 
 const SettingsPage = () => {
   const { userProfile } = useAuth();
@@ -21,18 +22,39 @@ const SettingsPage = () => {
         </header>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="credentials" className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              <span className="hidden sm:inline">Credentials</span>
+            </TabsTrigger>
+            <TabsTrigger value="developer" className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              <span className="hidden sm:inline">Developer</span>
+            </TabsTrigger>
+            <TabsTrigger value="support" className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Support</span>
+            </TabsTrigger>
+            <TabsTrigger value="integrations" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              <span className="hidden sm:inline">Integrations</span>
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="profile" className="space-y-4 mt-4">
+          <TabsContent value="profile" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>Profile Management</CardTitle>
                 <CardDescription>
-                  Update your personal information and company details.
+                  Update your personal information and login credentials.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -53,48 +75,17 @@ const SettingsPage = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label htmlFor="company-name" className="text-sm font-medium">
-                    Company Name
+                  <label htmlFor="entity-name" className="text-sm font-medium">
+                    Entity Name
                   </label>
                   <Input 
-                    id="company-name" 
+                    id="entity-name" 
                     type="text" 
                     defaultValue={userProfile?.businessName || ''}
                     className="max-w-md"
                   />
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Save Changes</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="notifications" className="space-y-4 mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Settings</CardTitle>
-                <CardDescription>
-                  Configure how you receive notifications.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Notification preferences are coming soon.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="security" className="space-y-4 mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Change Password</CardTitle>
-                <CardDescription>
-                  Update your password to keep your account secure.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+
                 <div className="space-y-2">
                   <label htmlFor="current-password" className="text-sm font-medium">
                     Current Password
@@ -127,8 +118,88 @@ const SettingsPage = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>Update Password</Button>
+                <Button>Save Changes</Button>
               </CardFooter>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="users" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>
+                  Manage team members and their access permissions.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  User management features will be available soon. You'll be able to invite team members and manage their roles.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="credentials" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Credentials Manager</CardTitle>
+                <CardDescription>
+                  Store and manage your government portal credentials securely.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Credentials manager for government portals (GST, ROC, Income Tax, etc.) coming soon.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="developer" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Developer Controls</CardTitle>
+                <CardDescription>
+                  API keys, webhooks, and advanced configuration options.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Developer tools and API access will be available in future updates.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="support" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Support Tickets</CardTitle>
+                <CardDescription>
+                  View and manage your support requests.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Support ticket system is being developed. For now, please contact support directly.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="integrations" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Integrations</CardTitle>
+                <CardDescription>
+                  Connect with third-party services and tools.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Integration capabilities with accounting software, banking, and other business tools coming soon.
+                </p>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>

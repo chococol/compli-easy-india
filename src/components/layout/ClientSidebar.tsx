@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -15,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 const clientNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
+  { icon: Home, label: 'Home', path: '/home' },
   { icon: Building, label: 'Organization', path: '/organization' },
   { icon: FileText, label: 'Documents', path: '/documents' },
   { icon: ClipboardCheck, label: 'Compliances', path: '/compliances' },
@@ -50,11 +49,12 @@ const ClientSidebar = () => {
   };
   
   const handleBackToProfessional = () => {
-    navigate('/professional/dashboard');
+    navigate('/professional/home');
+    onOpenChange(false);
   };
   
   return (
-    <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto">
+    <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto fixed">
       {isProfessionalView && (
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <div className="flex items-center gap-2 mb-2">
@@ -71,7 +71,7 @@ const ClientSidebar = () => {
             className="w-full"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to My Dashboard
+            Back to My Home
           </Button>
         </div>
       )}
@@ -100,7 +100,7 @@ const ClientSidebar = () => {
           <div className="text-sm font-medium">Need help?</div>
           <div className="text-xs text-muted-foreground mt-1">
             {isProfessionalView 
-              ? "You're viewing this client's dashboard as a professional." 
+              ? "You're viewing this client's data as a professional." 
               : "Contact your professional for assistance."
             }
           </div>

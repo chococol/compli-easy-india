@@ -80,8 +80,8 @@ function App() {
                 <Route path="/client-onboarding" element={<ProtectedRoute><ClientOnboarding /></ProtectedRoute>} />
                 <Route path="/professional-onboarding" element={<ProfessionalProtectedRoute><ProfessionalOnboarding /></ProfessionalProtectedRoute>} />
                 
-                {/* Default Dashboard Redirects */}
-                <Route path="/dashboard" element={<Navigate to="/client/dashboard" replace />} />
+                {/* Legacy Dashboard Redirects */}
+                <Route path="/dashboard" element={<Navigate to="/client/home" replace />} />
                 <Route path="/company" element={<Navigate to="/client/organization" replace />} />
                 <Route path="/documents" element={<Navigate to="/client/documents" replace />} />
                 <Route path="/tasks" element={<Navigate to="/client/compliances" replace />} />
@@ -91,7 +91,7 @@ function App() {
                 <Route path="/settings" element={<Navigate to="/client/settings" replace />} />
 
                 {/* Client Routes */}
-                <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/client/home" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/client/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
                 <Route path="/client/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
                 <Route path="/client/compliances" element={<ProtectedRoute><CompliancesPage /></ProtectedRoute>} />
@@ -100,7 +100,7 @@ function App() {
                 <Route path="/client/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
                 {/* Professional viewing client routes */}
-                <Route path="/professional/:clientId/dashboard" element={<ProfessionalProtectedRoute><Dashboard /></ProfessionalProtectedRoute>} />
+                <Route path="/professional/:clientId/home" element={<ProfessionalProtectedRoute><Dashboard /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/:clientId/organization" element={<ProfessionalProtectedRoute><OrganizationPage /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/:clientId/documents" element={<ProfessionalProtectedRoute><DocumentsPage /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/:clientId/compliances" element={<ProfessionalProtectedRoute><CompliancesPage /></ProfessionalProtectedRoute>} />
@@ -109,7 +109,7 @@ function App() {
                 <Route path="/professional/:clientId/settings" element={<ProfessionalProtectedRoute><SettingsPage /></ProfessionalProtectedRoute>} />
 
                 {/* Professional Routes */}
-                <Route path="/professional/dashboard" element={<ProfessionalProtectedRoute><ProfessionalDashboard /></ProfessionalProtectedRoute>} />
+                <Route path="/professional/home" element={<ProfessionalProtectedRoute><ProfessionalDashboard /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/companies" element={<ProfessionalProtectedRoute><CompaniesPage /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/companies/:companyId" element={<ProfessionalProtectedRoute><CompanyDetailsPage /></ProfessionalProtectedRoute>} />
                 <Route path="/professional/clients" element={<ProfessionalProtectedRoute><ClientsPage /></ProfessionalProtectedRoute>} />

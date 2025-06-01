@@ -28,7 +28,7 @@ interface MobileSidebarProps {
 }
 
 const professionalNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/professional/dashboard' },
+  { icon: Home, label: 'Home', path: '/professional/home' },
   { icon: Building, label: 'Companies', path: '/professional/companies' },
   { icon: CreditCard, label: 'Payments', path: '/professional/payments' },
   { icon: MessageSquare, label: 'Messages', path: '/professional/messages' },
@@ -36,7 +36,7 @@ const professionalNavItems = [
 ];
 
 const clientNavItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
+  { icon: Home, label: 'Home', path: '/home' },
   { icon: Building, label: 'Organization', path: '/organization' },
   { icon: FileText, label: 'Documents', path: '/documents' },
   { icon: ClipboardCheck, label: 'Compliances', path: '/compliances' },
@@ -75,12 +75,12 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
   };
   
   const handleBackToProfessional = () => {
-    navigate('/professional/dashboard');
+    navigate('/professional/home');
     onOpenChange(false);
   };
   
   const helpText = isProfessionalView
-    ? "You're viewing this client's dashboard as a professional."
+    ? "You're viewing this client's data as a professional."
     : isClientRoute 
     ? "Contact your professional for assistance."
     : "Contact your administrator or our support team.";
@@ -111,7 +111,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
                 className="w-full"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to My Dashboard
+                Back to My Home
               </Button>
             </div>
           )}

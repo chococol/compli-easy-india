@@ -16,12 +16,12 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       if (userProfile?.role === 'professional') {
-        navigate('/professional/dashboard');
+        navigate('/professional/home');
       } else if (userProfile?.role === 'business') {
-        navigate('/dashboard');
+        navigate('/client/home');
       } else {
-        // Default to dashboard if role is not specified
-        navigate('/dashboard');
+        // Default to client home if role is not specified
+        navigate('/client/home');
       }
     }
   }, [user, userProfile, navigate]);
@@ -36,7 +36,7 @@ const Index = () => {
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate('/mission')}>Our Mission</Button>
             <Button variant="ghost" onClick={() => navigate('/partner')}>Partner with Us</Button>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
+            <Button variant="ghost" onClick={() => navigate('/client/home')}>Home</Button>
             <Button onClick={() => navigate('/auth')}>Get Started</Button>
           </div>
         </div>
@@ -287,8 +287,8 @@ const Index = () => {
               <h4 className="font-semibold mb-3">Product</h4>
               <ul className="space-y-2">
                 <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/auth')}>Onboarding</Button></li>
-                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/dashboard')}>Compliance</Button></li>
-                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/documents')}>Document Management</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/client/home')}>Compliance</Button></li>
+                <li><Button variant="link" className="h-auto p-0" onClick={() => navigate('/client/documents')}>Document Management</Button></li>
               </ul>
             </div>
             
