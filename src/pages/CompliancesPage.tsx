@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Filter, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, Plus, Filter, Clock, CheckCircle2, AlertCircle, ClipboardCheck } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 type ComplianceStatus = 'pending-review' | 'under-process' | 'completed';
