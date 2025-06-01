@@ -49,7 +49,7 @@ const Index = () => {
             Revolutionizing Ease of Doing Business in India
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            Your all-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
+            All-in-one platform that simplifies company registration, streamlines compliance, and breaks down regulatory barriers for Indian entrepreneurs.
           </p>
           
           <div className="mb-8">
