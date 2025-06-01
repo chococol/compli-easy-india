@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NavLink, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -50,7 +51,6 @@ const ClientSidebar = () => {
   
   const handleBackToProfessional = () => {
     navigate('/professional/home');
-    onOpenChange(false);
   };
   
   return (
