@@ -5,7 +5,7 @@ import {
   Home, 
   Building,
   FileText,
-  ClipboardList,
+  ClipboardCheck,
   MessageSquare, 
   CreditCard, 
   Settings,
@@ -37,9 +37,9 @@ const professionalNavItems = [
 
 const clientNavItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: Building, label: 'My Company', path: '/company' },
+  { icon: Building, label: 'Organization', path: '/organization' },
   { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: ClipboardList, label: 'Tasks', path: '/tasks' },
+  { icon: ClipboardCheck, label: 'Compliances', path: '/compliances' },
   { icon: CreditCard, label: 'Payments', path: '/payments' },
   { icon: MessageSquare, label: 'Messages', path: '/messages' },
   { icon: Settings, label: 'Settings', path: '/settings' },
