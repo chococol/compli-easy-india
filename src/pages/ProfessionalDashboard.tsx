@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
-import { Users, FileCheck, AlertTriangle, UserPlus, Clock, Building, Eye } from 'lucide-react';
+import { Users, Clock, AlertTriangle, UserPlus, Building, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -99,7 +98,7 @@ const ProfessionalDashboard = () => {
   const highRiskClients = clients.filter(client => client.riskLevel === 'high').length;
   
   const addNewClient = () => {
-    navigate('/professional/clients/add');
+    navigate('/professional/companies/add');
   };
   
   const viewClientDashboard = (clientId: string) => {
@@ -126,7 +125,7 @@ const ProfessionalDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Professional Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              Welcome {userProfile?.professionalType} professional! Select a company to view their dashboard.
+              Welcome {userProfile?.professionalType} professional! Select a company to view their complete dashboard.
             </p>
           </div>
           <Button onClick={addNewClient} className="shrink-0">
@@ -158,87 +157,108 @@ const ProfessionalDashboard = () => {
           />
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building className="h-5 w-5" />
-              Your Companies
-            </CardTitle>
-            <CardDescription>Click on any company to view their complete dashboard</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="p-4 border rounded-lg animate-pulse">
+        {/* Main Companies Section - Now the primary focus */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Your Companies</h2>
+              <p className="text-muted-foreground">Click on any company to view their complete dashboard</p>
+            </div>
+          </div>
+          
+          {isLoading ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map(i => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader className="pb-3">
                     <div className="h-6 bg-muted rounded mb-2"></div>
-                    <div className="h-4 bg-muted rounded mb-2"></div>
-                    <div className="h-4 bg-muted rounded"></div>
-                  </div>
-                ))}
-              </div>
-            ) : clients.length === 0 ? (
-              <div className="text-center py-8">
-                <Building className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No companies yet</h3>
-                <p className="text-muted-foreground mb-4">Add your first client to get started</p>
-                <Button onClick={addNewClient}>
+                    <div className="h-4 bg-muted rounded w-20"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-muted rounded"></div>
+                      <div className="h-4 bg-muted rounded"></div>
+                      <div className="h-10 bg-muted rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : clients.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Building className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No companies yet</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Add your first client to start managing their compliance and view their complete dashboard.
+                </p>
+                <Button onClick={addNewClient} size="lg">
                   <UserPlus className="mr-2 h-4 w-4" />
                   Add Your First Client
                 </Button>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {clients.map(client => (
-                  <Card key={client.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center justify-between text-lg">
-                        <span className="truncate">{client.businessName}</span>
-                        <span className={`${getRiskBadgeClass(client.riskLevel)} rounded px-2 py-1 text-xs font-medium capitalize`}>
-                          {client.riskLevel}
-                        </span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Compliance Tasks</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{client.pendingCompliance}/{client.totalCompliance}</span>
-                            <div className="h-2 w-16 bg-muted overflow-hidden rounded-full">
-                              <div 
-                                className="h-full bg-primary" 
-                                style={{ 
-                                  width: client.totalCompliance > 0 
-                                    ? `${((client.totalCompliance - client.pendingCompliance) / client.totalCompliance) * 100}%` 
-                                    : '0%' 
-                                }}
-                              ></div>
-                            </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {clients.map(client => (
+                <Card key={client.id} className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center justify-between text-xl">
+                      <span className="truncate flex items-center gap-2">
+                        <Building className="h-5 w-5 text-primary" />
+                        {client.businessName}
+                      </span>
+                      <span className={`${getRiskBadgeClass(client.riskLevel)} rounded-full px-3 py-1 text-xs font-medium capitalize`}>
+                        {client.riskLevel}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Compliance Progress</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{client.totalCompliance - client.pendingCompliance}/{client.totalCompliance}</span>
+                          <div className="h-2 w-20 bg-muted overflow-hidden rounded-full">
+                            <div 
+                              className="h-full bg-primary transition-all duration-300" 
+                              style={{ 
+                                width: client.totalCompliance > 0 
+                                  ? `${((client.totalCompliance - client.pendingCompliance) / client.totalCompliance) * 100}%` 
+                                  : '0%' 
+                              }}
+                            ></div>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Last Activity</span>
-                          <span>{new Date(client.lastActivity).toLocaleDateString()}</span>
-                        </div>
-                        
-                        <Button 
-                          onClick={() => viewClientDashboard(client.id)}
-                          className="w-full mt-4"
-                          variant="outline"
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Dashboard
-                        </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                      
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Pending Tasks</span>
+                        <span className={`font-medium ${client.pendingCompliance > 0 ? 'text-amber-600' : 'text-green-600'}`}>
+                          {client.pendingCompliance}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Last Activity</span>
+                        <span className="font-medium">{new Date(client.lastActivity).toLocaleDateString()}</span>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => viewClientDashboard(client.id)}
+                        className="w-full mt-4"
+                        size="lg"
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Client Dashboard
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </MainLayout>
   );
