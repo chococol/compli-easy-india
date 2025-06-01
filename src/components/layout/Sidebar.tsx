@@ -19,7 +19,7 @@ const professionalNavItems = [
 
 const Sidebar = () => {
   return (
-    <aside className="w-64 border-r bg-card p-4 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto fixed">
+    <aside className="w-64 border-r bg-card p-4 flex flex-col h-screen overflow-y-auto">
       <nav className="space-y-1 mt-2">
         {professionalNavItems.map((item) => (
           <NavLink
