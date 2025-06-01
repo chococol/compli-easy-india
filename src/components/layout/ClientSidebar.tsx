@@ -13,7 +13,6 @@ import {
   User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
 
 const clientNavItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
@@ -25,20 +24,27 @@ const clientNavItems = [
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
+// Dummy client data for display
+const dummyClients: { [key: string]: string } = {
+  '1': 'Tech Solutions Inc.',
+  '2': 'Green Energy Corp.',
+  '3': 'Marketing Pros LLC',
+};
+
 const ClientSidebar = () => {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  const { userProfile } = useAuth();
   
-  // Check if this is being viewed by a professional
-  const isProfessionalView = location.pathname.startsWith('/professional/view-client/');
+  // Check if this is being viewed by a professional using new route structure
+  const isProfessionalView = location.pathname.startsWith('/professional/') && params.clientId;
   const clientId = params.clientId;
+  const clientName = clientId ? dummyClients[clientId] || `Client ${clientId}` : '';
   
   // Adjust paths based on context
   const getNavPath = (basePath: string) => {
     if (isProfessionalView && clientId) {
-      return `/professional/view-client/${clientId}${basePath}`;
+      return `/professional/${clientId}${basePath}`;
     }
     return `/client${basePath}`;
   };
@@ -53,7 +59,10 @@ const ClientSidebar = () => {
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <div className="flex items-center gap-2 mb-2">
             <User className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-600">Viewing Client Dashboard</span>
+            <span className="text-sm font-medium text-blue-600">Viewing Client</span>
+          </div>
+          <div className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
+            {clientName}
           </div>
           <Button 
             onClick={handleBackToProfessional}

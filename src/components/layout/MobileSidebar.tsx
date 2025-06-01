@@ -45,21 +45,29 @@ const clientNavItems = [
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
+// Dummy client data for display
+const dummyClients: { [key: string]: string } = {
+  '1': 'Tech Solutions Inc.',
+  '2': 'Green Energy Corp.',
+  '3': 'Marketing Pros LLC',
+};
+
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
   
   const isClientRoute = location.pathname.startsWith('/client');
-  const isProfessionalView = location.pathname.startsWith('/professional/view-client/');
+  const isProfessionalView = location.pathname.startsWith('/professional/') && params.clientId;
   const clientId = params.clientId;
+  const clientName = clientId ? dummyClients[clientId] || `Client ${clientId}` : '';
   
   // Choose navigation items based on route path
   const navItems = (isClientRoute || isProfessionalView) ? clientNavItems : professionalNavItems;
   
   const getNavPath = (basePath: string) => {
     if (isProfessionalView && clientId) {
-      return `/professional/view-client/${clientId}${basePath}`;
+      return `/professional/${clientId}${basePath}`;
     } else if (isClientRoute || isProfessionalView) {
       return `/client${basePath}`;
     }
@@ -91,7 +99,10 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ open, onOpenChange }) => 
             <div className="mx-2 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <User className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-600">Viewing Client Dashboard</span>
+                <span className="text-sm font-medium text-blue-600">Viewing Client</span>
+              </div>
+              <div className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                {clientName}
               </div>
               <Button 
                 onClick={handleBackToProfessional}
