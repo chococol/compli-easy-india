@@ -1,16 +1,17 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Filter, Clock, CheckCircle2, AlertCircle, ClipboardCheck } from 'lucide-react';
+import { Plus, Filter, Calendar, BarChart3 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import ComplianceStats from '@/components/compliances/ComplianceStats';
+import ComplianceFilters from '@/components/compliances/ComplianceFilters';
+import ComplianceCalendar from '@/components/compliances/ComplianceCalendar';
 
 type ComplianceStatus = 'pending-review' | 'under-process' | 'completed';
-type CompliancePriority = 'low' | 'medium' | 'high';
+type CompliancePriority = 'low' | 'medium' | 'high' | 'urgent';
 
 interface Compliance {
   id: string;
@@ -25,14 +26,14 @@ interface Compliance {
   isCustom: boolean;
 }
 
-// Mock compliances data with better structure
+// Mock compliances data
 const mockCompliances: Compliance[] = [
   {
     id: "comp-1",
     title: "GST Return Filing",
     description: "Monthly GST return submission",
     dueDate: "Apr 20, 2025",
-    category: "Tax Filing",
+    category: "tax",
     priority: "high",
     status: "pending-review",
     regulatoryReference: "GST Act, Section 39",
@@ -44,7 +45,7 @@ const mockCompliances: Compliance[] = [
     title: "Form 8 Annual Filing",
     description: "LLP annual return filing",
     dueDate: "May 30, 2025",
-    category: "Annual Filing",
+    category: "filing",
     priority: "medium",
     status: "under-process",
     regulatoryReference: "LLP Act, Section 35",
@@ -56,7 +57,7 @@ const mockCompliances: Compliance[] = [
     title: "FSSAI License Renewal",
     description: "Food safety license renewal",
     dueDate: "Jun 15, 2025",
-    category: "License Renewal",
+    category: "regulatory",
     priority: "medium",
     status: "completed",
     entityType: "Food Business",
@@ -67,7 +68,7 @@ const mockCompliances: Compliance[] = [
     title: "Property Tax Payment",
     description: "Commercial property tax payment",
     dueDate: "Mar 31, 2025",
-    category: "Tax Payment",
+    category: "tax",
     priority: "high",
     status: "pending-review",
     entityType: "Property Owner",
@@ -76,36 +77,41 @@ const mockCompliances: Compliance[] = [
 ];
 
 const CompliancesPage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
   const [compliances, setCompliances] = useState<Compliance[]>(mockCompliances);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   
-  // Filter compliances based on search query and active tab
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+
+  // Filter compliances based on current filters
   const filteredCompliances = compliances.filter((compliance) => {
     const matchesSearch = compliance.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (compliance.description?.toLowerCase().includes(searchQuery.toLowerCase()) || false);
     
-    if (activeTab === 'all') return matchesSearch;
-    if (activeTab === 'pending') return matchesSearch && compliance.status === 'pending-review';
-    if (activeTab === 'process') return matchesSearch && compliance.status === 'under-process';
-    if (activeTab === 'completed') return matchesSearch && compliance.status === 'completed';
+    const matchesCategory = selectedCategory === 'all' || compliance.category === selectedCategory;
+    const matchesPriority = selectedPriority === 'all' || compliance.priority === selectedPriority;
+    const matchesStatus = selectedStatus === 'all' || compliance.status === selectedStatus;
     
-    return false;
+    return matchesSearch && matchesCategory && matchesPriority && matchesStatus;
   });
-  
-  // Get counts for each status
-  const getCounts = () => {
-    const counts = {
-      all: compliances.length,
-      pending: compliances.filter(c => c.status === 'pending-review').length,
-      process: compliances.filter(c => c.status === 'under-process').length,
-      completed: compliances.filter(c => c.status === 'completed').length,
-    };
-    return counts;
-  };
-  
-  const counts = getCounts();
+
+  // Calculate stats
+  const totalCompliances = compliances.length;
+  const completedCompliances = compliances.filter(c => c.status === 'completed').length;
+  const pendingCompliances = compliances.filter(c => c.status === 'pending-review').length;
+  const overdueCompliances = 0; // Would calculate based on due dates
+
+  // Calendar events
+  const calendarEvents = compliances.map(compliance => ({
+    id: compliance.id,
+    title: compliance.title,
+    date: new Date(compliance.dueDate),
+    status: compliance.status === 'completed' ? 'completed' : compliance.status === 'under-process' ? 'pending' : 'pending',
+    category: compliance.category,
+  }));
 
   const updateComplianceStatus = async (complianceId: string, newStatus: ComplianceStatus) => {
     setCompliances(prevCompliances => 
@@ -119,6 +125,13 @@ const CompliancesPage = () => {
       description: `Status changed to ${newStatus.replace('-', ' ')}`,
     });
   };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedPriority('all');
+    setSelectedStatus('all');
+  };
   
   return (
     <MainLayout>
@@ -130,89 +143,120 @@ const CompliancesPage = () => {
               Track and manage your regulatory compliance requirements
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
-            <Button onClick={() => setShowAddForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Custom Compliance
-            </Button>
-          </div>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Custom Compliance
+          </Button>
         </header>
-        
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search compliances..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        
-        <Tabs defaultValue="all" onValueChange={setActiveTab}>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 md:w-[500px]">
-            <TabsTrigger value="all">
-              All
-              <Badge variant="secondary" className="ml-2">
-                {counts.all}
-              </Badge>
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Overview
             </TabsTrigger>
-            <TabsTrigger value="pending">
-              Pending Review
-              <Badge variant="secondary" className="ml-2">
-                {counts.pending}
-              </Badge>
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              List View
             </TabsTrigger>
-            <TabsTrigger value="process">
-              Under Process
-              <Badge variant="secondary" className="ml-2">
-                {counts.process}
-              </Badge>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendar
             </TabsTrigger>
-            <TabsTrigger value="completed">
-              Completed
-              <Badge variant="secondary" className="ml-2">
-                {counts.completed}
-              </Badge>
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Reports
             </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="all" className="mt-6">
-            <CompliancesList compliances={filteredCompliances} updateStatus={updateComplianceStatus} />
+
+          <TabsContent value="overview" className="space-y-6">
+            <ComplianceStats
+              totalCompliances={totalCompliances}
+              completedCompliances={completedCompliances}
+              pendingCompliances={pendingCompliances}
+              overdueCompliances={overdueCompliances}
+            />
+            
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Compliances</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {compliances.slice(0, 5).map((compliance) => (
+                      <div key={compliance.id} className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{compliance.title}</p>
+                          <p className="text-sm text-muted-foreground">Due: {compliance.dueDate}</p>
+                        </div>
+                        <ComplianceStatusBadge status={compliance.status} />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upcoming Deadlines</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {compliances
+                      .filter(c => c.status !== 'completed')
+                      .slice(0, 5)
+                      .map((compliance) => (
+                        <div key={compliance.id} className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{compliance.title}</p>
+                            <p className="text-sm text-muted-foreground">{compliance.category}</p>
+                          </div>
+                          <Badge variant="outline">{compliance.dueDate}</Badge>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
-          
-          <TabsContent value="pending" className="mt-6">
-            <CompliancesList compliances={filteredCompliances} updateStatus={updateComplianceStatus} />
+
+          <TabsContent value="list" className="space-y-6">
+            <ComplianceFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              selectedPriority={selectedPriority}
+              onPriorityChange={setSelectedPriority}
+              selectedStatus={selectedStatus}
+              onStatusChange={setSelectedStatus}
+              onClearFilters={clearFilters}
+            />
+            
+            <CompliancesList 
+              compliances={filteredCompliances} 
+              updateStatus={updateComplianceStatus} 
+            />
           </TabsContent>
-          
-          <TabsContent value="process" className="mt-6">
-            <CompliancesList compliances={filteredCompliances} updateStatus={updateComplianceStatus} />
+
+          <TabsContent value="calendar" className="space-y-6">
+            <ComplianceCalendar events={calendarEvents} />
           </TabsContent>
-          
-          <TabsContent value="completed" className="mt-6">
-            <CompliancesList compliances={filteredCompliances} updateStatus={updateComplianceStatus} />
+
+          <TabsContent value="reports" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Compliance Reports</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-center py-8">
+                  Compliance reports and analytics coming soon
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
-
-        {showAddForm && (
-          <AddCustomComplianceForm 
-            onClose={() => setShowAddForm(false)} 
-            onAdd={(newCompliance) => {
-              setCompliances(prev => [...prev, newCompliance]);
-              setShowAddForm(false);
-              toast({
-                title: "Custom compliance added",
-                description: "Your custom compliance requirement has been added successfully.",
-              });
-            }}
-          />
-        )}
       </div>
     </MainLayout>
   );
@@ -226,9 +270,9 @@ interface CompliancesListProps {
 const CompliancesList: React.FC<CompliancesListProps> = ({ compliances, updateStatus }) => {
   const getStatusIcon = (status: ComplianceStatus) => {
     switch(status) {
-      case 'pending-review': return <Clock className="h-4 w-4 text-yellow-600" />;
-      case 'under-process': return <AlertCircle className="h-4 w-4 text-blue-600" />;
-      case 'completed': return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+      case 'pending-review': return '🕐';
+      case 'under-process': return '⚡';
+      case 'completed': return '✅';
     }
   };
 
@@ -256,8 +300,7 @@ const CompliancesList: React.FC<CompliancesListProps> = ({ compliances, updateSt
       {compliances.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <ClipboardCheck className="h-12 w-12 text-muted-foreground opacity-25 mb-4" />
-            <h3 className="text-lg font-medium mb-1">No compliances found</h3>
+            <p className="text-lg font-medium mb-1">No compliances found</p>
             <p className="text-muted-foreground text-sm">
               Try adjusting your search or filters
             </p>
@@ -270,7 +313,7 @@ const CompliancesList: React.FC<CompliancesListProps> = ({ compliances, updateSt
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start gap-3 mb-3">
-                    {getStatusIcon(compliance.status)}
+                    <span className="text-lg">{getStatusIcon(compliance.status)}</span>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-lg">{compliance.title}</h3>
@@ -282,10 +325,7 @@ const CompliancesList: React.FC<CompliancesListProps> = ({ compliances, updateSt
                         {compliance.description || "No description provided"}
                       </p>
                       <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          Due: {compliance.dueDate}
-                        </span>
+                        <span>Due: {compliance.dueDate}</span>
                         <span>Category: {compliance.category}</span>
                         <span>Entity: {compliance.entityType}</span>
                       </div>
@@ -330,100 +370,23 @@ const CompliancesList: React.FC<CompliancesListProps> = ({ compliances, updateSt
   );
 };
 
-interface AddCustomComplianceFormProps {
-  onClose: () => void;
-  onAdd: (compliance: Compliance) => void;
-}
-
-const AddCustomComplianceForm: React.FC<AddCustomComplianceFormProps> = ({ onClose, onAdd }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [entityType, setEntityType] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const newCompliance: Compliance = {
-      id: `custom-${Date.now()}`,
-      title,
-      description,
-      dueDate,
-      category,
-      priority: 'medium',
-      status: 'pending-review',
-      entityType,
-      isCustom: true
-    };
-    
-    onAdd(newCompliance);
+const ComplianceStatusBadge: React.FC<{ status: ComplianceStatus }> = ({ status }) => {
+  const badgeClasses = {
+    'pending-review': 'bg-yellow-100 text-yellow-800',
+    'under-process': 'bg-blue-100 text-blue-800',
+    'completed': 'bg-green-100 text-green-800',
   };
-
+  
+  const statusLabels = {
+    'pending-review': 'Pending Review',
+    'under-process': 'Under Process',
+    'completed': 'Completed',
+  };
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Add Custom Compliance</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="text-sm font-medium">Title</label>
-              <Input 
-                value={title} 
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., FSSAI License Renewal"
-                required 
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Category</label>
-              <Input 
-                value={category} 
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g., License Renewal"
-                required 
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Due Date</label>
-              <Input 
-                type="date" 
-                value={dueDate} 
-                onChange={(e) => setDueDate(e.target.value)}
-                required 
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Entity Type</label>
-              <Input 
-                value={entityType} 
-                onChange={(e) => setEntityType(e.target.value)}
-                placeholder="e.g., Food Business, Property Owner"
-                required 
-              />
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Description</label>
-            <Input 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the compliance requirement"
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              Add Compliance
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <Badge className={badgeClasses[status]}>
+      {statusLabels[status]}
+    </Badge>
   );
 };
 

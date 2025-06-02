@@ -10,18 +10,12 @@ import {
   Calendar, 
   FileCheck, 
   Mail, 
-  MessageSquare, 
   Phone, 
-  User, 
   FileText,
   PlusCircle,
   Pencil
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import DocumentsList from '@/components/documents/DocumentsList';
-import DocumentUpload from '@/components/documents/DocumentUpload';
 
 type ClientDetails = {
   id: string;
@@ -49,7 +43,6 @@ const ClientDetailsPage = () => {
   const { clientId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [client, setClient] = useState<ClientDetails | null>(null);
   const [complianceItems, setComplianceItems] = useState<ComplianceItem[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -58,32 +51,45 @@ const ClientDetailsPage = () => {
 
   useEffect(() => {
     const fetchClientData = async () => {
-      if (!clientId || !user) return;
-      
       setIsLoading(true);
       try {
-        // Fetch client details
-        const { data: clientData, error: clientError } = await supabase
-          .from('clients')
-          .select('*')
-          .eq('id', clientId)
-          .eq('professional_id', user.id)
-          .single();
-          
-        if (clientError) throw clientError;
+        // Simulate API call with dummy data
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        setClient(clientData);
+        const dummyClient: ClientDetails = {
+          id: clientId || '1',
+          name: 'ABC Technologies Pvt Ltd',
+          company_type: 'private_limited',
+          id_type: 'CIN',
+          identification: 'U72900DL2020PTC123456',
+          email: 'contact@abctech.com',
+          phone: '+91 98765 43210',
+          address: '123 Business Street, Corporate City, 56789',
+          compliance_status: 'good',
+          created_at: '2024-01-15T10:30:00Z'
+        };
         
-        // Fetch compliance tasks
-        const { data: tasksData, error: tasksError } = await supabase
-          .from('compliance_tasks')
-          .select('*')
-          .eq('client_id', clientId)
-          .order('due_date', { ascending: true });
-          
-        if (tasksError) throw tasksError;
+        const dummyTasks: ComplianceItem[] = [
+          {
+            id: '1',
+            title: 'GST Return Filing',
+            due_date: '2024-04-20T00:00:00Z',
+            status: 'pending',
+            category: 'GST',
+            description: 'Monthly GST return submission'
+          },
+          {
+            id: '2',
+            title: 'Income Tax Return',
+            due_date: '2024-03-31T00:00:00Z',
+            status: 'in-progress',
+            category: 'Tax',
+            description: 'Annual income tax return filing'
+          }
+        ];
         
-        setComplianceItems(tasksData || []);
+        setClient(dummyClient);
+        setComplianceItems(dummyTasks);
       } catch (error: any) {
         toast({
           title: "Error",
@@ -92,45 +98,15 @@ const ClientDetailsPage = () => {
         });
       } finally {
         setIsLoading(false);
-      }
-    };
-    
-    const fetchDocuments = async () => {
-      if (!clientId) return;
-      
-      setIsDocumentsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('client_documents')
-          .select('*')
-          .eq('client_id', clientId)
-          .order('uploaded_at', { ascending: false })
-          .limit(5);
-          
-        if (error) throw error;
-        
-        setDocuments(data || []);
-      } catch (error: any) {
-        console.error('Error fetching documents:', error);
-      } finally {
         setIsDocumentsLoading(false);
       }
     };
     
     fetchClientData();
-    fetchDocuments();
-  }, [clientId, toast, user]);
+  }, [clientId, toast]);
   
   const updateTaskStatus = async (taskId: string, newStatus: ComplianceItem['status']) => {
     try {
-      const { error } = await supabase
-        .from('compliance_tasks')
-        .update({ status: newStatus })
-        .eq('id', taskId);
-        
-      if (error) throw error;
-      
-      // Update local state
       setComplianceItems(prev => 
         prev.map(item => 
           item.id === taskId 
@@ -146,28 +122,9 @@ const ClientDetailsPage = () => {
     } catch (error: any) {
       toast({
         title: "Update failed",
-        description: error.message,
+        description: 'Failed to update status',
         variant: "destructive",
       });
-    }
-  };
-  
-  const handleDocumentUploadSuccess = async () => {
-    if (!clientId) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('client_documents')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('uploaded_at', { ascending: false })
-        .limit(5);
-        
-      if (error) throw error;
-      
-      setDocuments(data || []);
-    } catch (error: any) {
-      console.error('Error refreshing documents:', error);
     }
   };
   
@@ -199,11 +156,11 @@ const ClientDetailsPage = () => {
         <div className="text-center py-10">
           <h2 className="text-2xl font-bold">Client not found</h2>
           <p className="text-muted-foreground mt-2">
-            The client you're looking for doesn't exist or you don't have permission to view it.
+            The client you're looking for doesn't exist.
           </p>
           <Button 
             className="mt-4"
-            onClick={() => navigate('/professional/clients')}
+            onClick={() => navigate('/clients')}
           >
             View All Clients
           </Button>
@@ -380,23 +337,13 @@ const ClientDetailsPage = () => {
               <CardTitle>Recent Documents</CardTitle>
               <CardDescription>Latest documents for {client.name}</CardDescription>
             </div>
-            <div className="flex gap-2">
-              <DocumentUpload 
-                clientId={client.id} 
-                onSuccess={handleDocumentUploadSuccess}
-              />
-              <Button variant="outline" onClick={handleViewAllDocuments}>
-                <FileText className="mr-2 h-4 w-4" />
-                View All Documents
-              </Button>
-            </div>
+            <Button variant="outline" onClick={handleViewAllDocuments}>
+              <FileText className="mr-2 h-4 w-4" />
+              View All Documents
+            </Button>
           </CardHeader>
           <CardContent>
-            <DocumentsList
-              documents={documents}
-              isLoading={isDocumentsLoading}
-              noDocumentsMessage="No documents uploaded yet for this client"
-            />
+            <p className="text-muted-foreground text-center py-8">No documents uploaded yet</p>
           </CardContent>
         </Card>
       </div>

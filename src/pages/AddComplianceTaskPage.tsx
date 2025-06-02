@@ -30,8 +30,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 
 const complianceTaskSchema = z.object({
   title: z.string().min(2, { message: 'Title must be at least 2 characters long' }),
@@ -50,36 +48,8 @@ const AddComplianceTaskPage = () => {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [clientName, setClientName] = React.useState('');
+  const [clientName, setClientName] = React.useState('ABC Corporation');
   const [isLoading, setIsLoading] = React.useState(false);
-  
-  React.useEffect(() => {
-    const fetchClientName = async () => {
-      if (!clientId || !user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('clients')
-          .select('name')
-          .eq('id', clientId)
-          .eq('professional_id', user.id)
-          .single();
-        
-        if (error) throw error;
-        
-        setClientName(data.name);
-      } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch client information',
-          variant: 'destructive',
-        });
-      }
-    };
-    
-    fetchClientName();
-  }, [clientId, user, toast]);
   
   const form = useForm<ComplianceTaskFormValues>({
     resolver: zodResolver(complianceTaskSchema),
@@ -94,41 +64,24 @@ const AddComplianceTaskPage = () => {
   });
   
   const onSubmit = async (data: ComplianceTaskFormValues) => {
-    if (!clientId || !user) {
-      toast({
-        title: 'Error',
-        description: 'Missing client ID or user information',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.from('compliance_tasks').insert({
-        client_id: clientId,
-        professional_id: user.id,
-        title: data.title,
-        category: data.category,
-        due_date: data.dueDate.toISOString(),
-        description: data.description || null,
-        priority: data.priority,
-        status: data.status,
-      });
+      // Simulate API call with dummy data
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (error) throw error;
+      console.log('Adding compliance task:', data);
       
       toast({
         title: 'Task Created',
         description: 'Compliance task has been created successfully',
       });
       
-      navigate(`/professional/clients/${clientId}`);
+      navigate(`/professional/${clientId}`);
     } catch (error: any) {
       toast({
         title: 'Failed to create task',
-        description: error.message,
+        description: 'An error occurred while creating the task',
         variant: 'destructive',
       });
     } finally {
@@ -316,7 +269,7 @@ const AddComplianceTaskPage = () => {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => navigate(`/professional/clients/${clientId}`)}
+                    onClick={() => navigate(`/professional/${clientId}`)}
                   >
                     Cancel
                   </Button>
