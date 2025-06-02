@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -114,43 +113,7 @@ const dummyShareholders = [
 ];
 
 const OrganizationPage = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('organization');
-
-  // Handle sub-route navigation
-  useEffect(() => {
-    const path = location.pathname;
-    if (path.includes('/associates')) {
-      setActiveTab('associates');
-    } else if (path.includes('/stakeholders')) {
-      setActiveTab('stakeholders');
-    } else if (path.includes('/assets')) {
-      setActiveTab('assets');
-    } else {
-      setActiveTab('organization');
-    }
-  }, [location.pathname]);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    // Update URL based on tab selection
-    const basePath = location.pathname.includes('/client') ? '/client/organization' : '/organization';
-    switch (value) {
-      case 'associates':
-        navigate(`${basePath}/associates`);
-        break;
-      case 'stakeholders':
-        navigate(`${basePath}/stakeholders`);
-        break;
-      case 'assets':
-        navigate(`${basePath}/assets`);
-        break;
-      default:
-        navigate(basePath);
-        break;
-    }
-  };
 
   return (
     <MainLayout>
@@ -162,7 +125,7 @@ const OrganizationPage = () => {
           </p>
         </header>
 
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <Tabs defaultValue="organization" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 md:w-[600px]">
             <TabsTrigger value="organization" className="flex items-center gap-2">
               <Building className="h-4 w-4" />

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -17,6 +18,7 @@ import {
   Pencil
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import DocumentsList from '@/components/documents/DocumentsList';
 import DocumentUpload from '@/components/documents/DocumentUpload';
@@ -60,35 +62,28 @@ const ClientDetailsPage = () => {
       
       setIsLoading(true);
       try {
-        // Simulate client data
-        const mockClient: ClientDetails = {
-          id: clientId,
-          name: `Client ${clientId}`,
-          company_type: 'private_limited',
-          id_type: 'PAN',
-          identification: 'ABCDE1234F',
-          email: 'client@example.com',
-          phone: '+1234567890',
-          address: '123 Business Street',
-          compliance_status: 'active',
-          created_at: new Date().toISOString()
-        };
+        // Fetch client details
+        const { data: clientData, error: clientError } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('id', clientId)
+          .eq('professional_id', user.id)
+          .single();
+          
+        if (clientError) throw clientError;
         
-        setClient(mockClient);
+        setClient(clientData);
         
-        // Simulate compliance tasks
-        const mockTasks: ComplianceItem[] = [
-          {
-            id: '1',
-            title: 'GST Return Filing',
-            due_date: '2024-01-31',
-            status: 'pending',
-            category: 'GST',
-            description: 'Monthly GST return filing'
-          }
-        ];
+        // Fetch compliance tasks
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('compliance_tasks')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('due_date', { ascending: true });
+          
+        if (tasksError) throw tasksError;
         
-        setComplianceItems(mockTasks);
+        setComplianceItems(tasksData || []);
       } catch (error: any) {
         toast({
           title: "Error",
@@ -105,8 +100,16 @@ const ClientDetailsPage = () => {
       
       setIsDocumentsLoading(true);
       try {
-        // Simulate documents
-        setDocuments([]);
+        const { data, error } = await supabase
+          .from('client_documents')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('uploaded_at', { ascending: false })
+          .limit(5);
+          
+        if (error) throw error;
+        
+        setDocuments(data || []);
       } catch (error: any) {
         console.error('Error fetching documents:', error);
       } finally {
@@ -120,7 +123,14 @@ const ClientDetailsPage = () => {
   
   const updateTaskStatus = async (taskId: string, newStatus: ComplianceItem['status']) => {
     try {
-      // Simulate status update
+      const { error } = await supabase
+        .from('compliance_tasks')
+        .update({ status: newStatus })
+        .eq('id', taskId);
+        
+      if (error) throw error;
+      
+      // Update local state
       setComplianceItems(prev => 
         prev.map(item => 
           item.id === taskId 
@@ -143,8 +153,22 @@ const ClientDetailsPage = () => {
   };
   
   const handleDocumentUploadSuccess = async () => {
-    // Simulate document refresh
-    setDocuments([]);
+    if (!clientId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('client_documents')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('uploaded_at', { ascending: false })
+        .limit(5);
+        
+      if (error) throw error;
+      
+      setDocuments(data || []);
+    } catch (error: any) {
+      console.error('Error refreshing documents:', error);
+    }
   };
   
   const handleAddComplianceTask = () => {

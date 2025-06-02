@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -29,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 const complianceTaskSchema = z.object({
@@ -49,15 +51,35 @@ const AddComplianceTaskPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [clientName, setClientName] = React.useState('Sample Client');
+  const [clientName, setClientName] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   
   React.useEffect(() => {
-    // Simulate fetching client name
-    if (clientId) {
-      setClientName(`Client ${clientId}`);
-    }
-  }, [clientId]);
+    const fetchClientName = async () => {
+      if (!clientId || !user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('name')
+          .eq('id', clientId)
+          .eq('professional_id', user.id)
+          .single();
+        
+        if (error) throw error;
+        
+        setClientName(data.name);
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch client information',
+          variant: 'destructive',
+        });
+      }
+    };
+    
+    fetchClientName();
+  }, [clientId, user, toast]);
   
   const form = useForm<ComplianceTaskFormValues>({
     resolver: zodResolver(complianceTaskSchema),
@@ -84,12 +106,18 @@ const AddComplianceTaskPage = () => {
     setIsLoading(true);
     
     try {
-      // Simulate task creation
-      console.log('Task data to be saved:', {
+      const { error } = await supabase.from('compliance_tasks').insert({
         client_id: clientId,
         professional_id: user.id,
-        ...data
+        title: data.title,
+        category: data.category,
+        due_date: data.dueDate.toISOString(),
+        description: data.description || null,
+        priority: data.priority,
+        status: data.status,
       });
+      
+      if (error) throw error;
       
       toast({
         title: 'Task Created',
