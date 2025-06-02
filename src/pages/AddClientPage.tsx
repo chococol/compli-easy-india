@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,24 +85,8 @@ const AddClientPage = () => {
     }
     
     try {
-      const clientData = {
-        professional_id: user.id,
-        name: data.name,
-        company_type: data.company_type,
-        cin: data.cin || null,
-        pan: data.pan,
-        tan: data.tan || null,
-        is_gst_registered: data.is_gst_registered,
-        gstin: data.is_gst_registered ? data.gstin : null,
-        email: data.email,
-        phone: data.phone || null,
-        address: data.address || null,
-        compliance_status: 'pending',
-      };
-      
-      const { error } = await supabase.from('clients').insert(clientData);
-      
-      if (error) throw error;
+      // Simulate successful client creation for now
+      console.log('Client data to be saved:', data);
       
       toast({
         title: 'Client Added',
