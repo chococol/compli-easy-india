@@ -10,13 +10,52 @@ import MainLayout from '@/components/layout/MainLayout';
 import AddComplianceDialog from '@/components/compliances/AddComplianceDialog';
 import FileComplianceDialog from '@/components/compliances/FileComplianceDialog';
 
-const dummyLicenses = [
+type LicenseStatus = 'pending' | 'filed' | 'under_review' | 'completed' | 'expired';
+
+interface License {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: LicenseStatus;
+  category: string;
+  requiresCA: boolean;
+}
+
+const dummyLicenses: License[] = [
   {
     id: '1',
     title: 'GST Registration',
     description: 'Goods and Services Tax registration',
     dueDate: '2024-02-15',
-    status: 'completed' as const,
+    status: 'completed',
+    category: 'Tax Licenses',
+    requiresCA: false,
+  },
+  {
+    id: '2',
+    title: 'Shop & Establishment License',
+    description: 'Local shop establishment permit',
+    dueDate: '2024-03-01',
+    status: 'pending',
+    category: 'Trade Licenses',
+    requiresCA: false,
+  },
+  {
+    id: '3',
+    title: 'FSSAI License',
+    description: 'Food Safety and Standards Authority license',
+    dueDate: '2024-04-15',
+    status: 'under_review',
+    category: 'Trade Licenses',
+    requiresCA: false,
+  },
+  {
+    id: '4',
+    title: 'Professional Tax License',
+    description: 'State professional tax registration',
+    dueDate: '2024-01-31',
+    status: 'expired',
     category: 'Tax Licenses',
     requiresCA: false,
   },
@@ -26,25 +65,31 @@ const availableLicenses = {
   'Tax Licenses': [
     { id: 'tax1', title: 'GST Registration', description: 'Register for Goods and Services Tax', requiresCA: false },
     { id: 'tax2', title: 'Professional Tax License', description: 'State professional tax registration', requiresCA: false },
+    { id: 'tax3', title: 'TDS License', description: 'Tax Deducted at Source registration', requiresCA: true },
   ],
   'Trade Licenses': [
     { id: 'trade1', title: 'Shop & Establishment License', description: 'Local shop establishment permit', requiresCA: false },
     { id: 'trade2', title: 'FSSAI License', description: 'Food Safety and Standards Authority license', requiresCA: false },
+    { id: 'trade3', title: 'Import Export Code', description: 'IEC for international trade', requiresCA: false },
+  ],
+  'Environmental Licenses': [
+    { id: 'env1', title: 'Pollution Control License', description: 'Environmental clearance certificate', requiresCA: false },
+    { id: 'env2', title: 'Water NOC', description: 'No Objection Certificate for water usage', requiresCA: false },
   ],
 };
 
 const LicensesPage = () => {
-  const [licenses, setLicenses] = useState(dummyLicenses);
+  const [licenses, setLicenses] = useState<License[]>(dummyLicenses);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('dueDate');
 
   const handleAddLicense = (license: any, dueDate: string) => {
-    const newLicense = {
+    const newLicense: License = {
       id: Date.now().toString(),
       title: license.title,
       description: license.description,
       dueDate,
-      status: 'pending' as const,
+      status: 'pending',
       category: license.category,
       requiresCA: license.requiresCA || false,
     };
@@ -53,7 +98,7 @@ const LicensesPage = () => {
 
   const handleFileLicense = (licenseId: string) => {
     setLicenses(licenses.map(l => 
-      l.id === licenseId ? { ...l, status: 'filed' as const } : l
+      l.id === licenseId ? { ...l, status: 'filed' } : l
     ));
   };
 
@@ -69,6 +114,7 @@ const LicensesPage = () => {
       case 'filed': return 'bg-blue-100 text-blue-800';
       case 'under_review': return 'bg-purple-100 text-purple-800';
       case 'completed': return 'bg-green-100 text-green-800';
+      case 'expired': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };

@@ -10,13 +10,25 @@ import MainLayout from '@/components/layout/MainLayout';
 import AddComplianceDialog from '@/components/compliances/AddComplianceDialog';
 import FileComplianceDialog from '@/components/compliances/FileComplianceDialog';
 
-const dummyCompanyCompliances = [
+type ComplianceStatus = 'pending' | 'filed' | 'under_review' | 'completed';
+
+interface Compliance {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: ComplianceStatus;
+  category: string;
+  requiresCA: boolean;
+}
+
+const dummyCompanyCompliances: Compliance[] = [
   {
     id: '1',
     title: 'Annual Return Filing',
     description: 'File annual return with ROC',
     dueDate: '2024-03-31',
-    status: 'pending' as const,
+    status: 'pending',
     category: 'ROC Compliances',
     requiresCA: true,
   },
@@ -25,8 +37,26 @@ const dummyCompanyCompliances = [
     title: 'Board Meeting Minutes',
     description: 'Quarterly board meeting documentation',
     dueDate: '2024-01-15',
-    status: 'filed' as const,
+    status: 'filed',
     category: 'Board Compliances',
+    requiresCA: false,
+  },
+  {
+    id: '3',
+    title: 'Financial Statement Filing',
+    description: 'Submit audited financial statements to ROC',
+    dueDate: '2024-02-28',
+    status: 'under_review',
+    category: 'ROC Compliances',
+    requiresCA: true,
+  },
+  {
+    id: '4',
+    title: 'Form DIR-3 KYC',
+    description: 'Director KYC compliance filing',
+    dueDate: '2024-04-30',
+    status: 'completed',
+    category: 'Director Compliances',
     requiresCA: false,
   },
 ];
@@ -35,25 +65,31 @@ const availableCompanyCompliances = {
   'ROC Compliances': [
     { id: 'roc1', title: 'Annual Return Filing', description: 'File Form MGT-7 with ROC', requiresCA: true },
     { id: 'roc2', title: 'Financial Statement Filing', description: 'File audited financial statements', requiresCA: true },
+    { id: 'roc3', title: 'Form MGT-14', description: 'Special resolution filing', requiresCA: false },
   ],
   'Board Compliances': [
     { id: 'board1', title: 'Board Resolution', description: 'Document board decisions', requiresCA: false },
     { id: 'board2', title: 'AGM Compliance', description: 'Annual General Meeting requirements', requiresCA: false },
+    { id: 'board3', title: 'Board Meeting Minutes', description: 'Quarterly board meeting documentation', requiresCA: false },
+  ],
+  'Director Compliances': [
+    { id: 'dir1', title: 'Form DIR-3 KYC', description: 'Director KYC compliance', requiresCA: false },
+    { id: 'dir2', title: 'DIN Application', description: 'Director Identification Number', requiresCA: false },
   ],
 };
 
 const CompanyCompliancesPage = () => {
-  const [compliances, setCompliances] = useState(dummyCompanyCompliances);
+  const [compliances, setCompliances] = useState<Compliance[]>(dummyCompanyCompliances);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('dueDate');
 
   const handleAddCompliance = (compliance: any, dueDate: string) => {
-    const newCompliance = {
+    const newCompliance: Compliance = {
       id: Date.now().toString(),
       title: compliance.title,
       description: compliance.description,
       dueDate,
-      status: 'pending' as const,
+      status: 'pending',
       category: compliance.category,
       requiresCA: compliance.requiresCA || false,
     };
@@ -62,7 +98,7 @@ const CompanyCompliancesPage = () => {
 
   const handleFileCompliance = (complianceId: string) => {
     setCompliances(compliances.map(c => 
-      c.id === complianceId ? { ...c, status: 'filed' as const } : c
+      c.id === complianceId ? { ...c, status: 'filed' } : c
     ));
   };
 

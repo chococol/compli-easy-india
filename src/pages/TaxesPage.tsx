@@ -10,13 +10,25 @@ import MainLayout from '@/components/layout/MainLayout';
 import AddComplianceDialog from '@/components/compliances/AddComplianceDialog';
 import FileComplianceDialog from '@/components/compliances/FileComplianceDialog';
 
-const dummyTaxes = [
+type TaxStatus = 'pending' | 'filed' | 'under_review' | 'completed';
+
+interface Tax {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: TaxStatus;
+  category: string;
+  requiresCA: boolean;
+}
+
+const dummyTaxes: Tax[] = [
   {
     id: '1',
     title: 'GST Return Filing',
     description: 'Monthly GST return submission',
     dueDate: '2024-01-20',
-    status: 'pending' as const,
+    status: 'pending',
     category: 'GST',
     requiresCA: true,
   },
@@ -25,9 +37,27 @@ const dummyTaxes = [
     title: 'Income Tax Return',
     description: 'Annual income tax filing',
     dueDate: '2024-07-31',
-    status: 'under_review' as const,
+    status: 'under_review',
     category: 'Income Tax',
     requiresCA: true,
+  },
+  {
+    id: '3',
+    title: 'TDS Return',
+    description: 'Quarterly TDS return filing',
+    dueDate: '2024-01-31',
+    status: 'filed',
+    category: 'TDS',
+    requiresCA: true,
+  },
+  {
+    id: '4',
+    title: 'Professional Tax',
+    description: 'Monthly professional tax payment',
+    dueDate: '2024-01-15',
+    status: 'completed',
+    category: 'Professional Tax',
+    requiresCA: false,
   },
 ];
 
@@ -35,28 +65,36 @@ const availableTaxes = {
   'GST': [
     { id: 'gst1', title: 'GST Return Filing', description: 'Monthly GST return submission', requiresCA: true },
     { id: 'gst2', title: 'GST Annual Return', description: 'Annual GST return filing', requiresCA: true },
+    { id: 'gst3', title: 'GSTR-1', description: 'Outward supplies return', requiresCA: true },
+    { id: 'gst4', title: 'GSTR-3B', description: 'Summary return and cash payment', requiresCA: true },
   ],
   'Income Tax': [
     { id: 'it1', title: 'Income Tax Return', description: 'Annual income tax filing', requiresCA: true },
-    { id: 'it2', title: 'TDS Return', description: 'Tax Deducted at Source return', requiresCA: true },
+    { id: 'it2', title: 'Advance Tax Payment', description: 'Quarterly advance tax installments', requiresCA: true },
+    { id: 'it3', title: 'Form 16 Generation', description: 'Salary certificate for employees', requiresCA: false },
+  ],
+  'TDS': [
+    { id: 'tds1', title: 'TDS Return', description: 'Tax Deducted at Source return', requiresCA: true },
+    { id: 'tds2', title: 'TCS Return', description: 'Tax Collected at Source return', requiresCA: true },
   ],
   'Professional Tax': [
     { id: 'pt1', title: 'Professional Tax Return', description: 'Monthly professional tax filing', requiresCA: false },
+    { id: 'pt2', title: 'Professional Tax Registration', description: 'State professional tax registration', requiresCA: false },
   ],
 };
 
 const TaxesPage = () => {
-  const [taxes, setTaxes] = useState(dummyTaxes);
+  const [taxes, setTaxes] = useState<Tax[]>(dummyTaxes);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('dueDate');
 
   const handleAddTax = (tax: any, dueDate: string) => {
-    const newTax = {
+    const newTax: Tax = {
       id: Date.now().toString(),
       title: tax.title,
       description: tax.description,
       dueDate,
-      status: 'pending' as const,
+      status: 'pending',
       category: tax.category,
       requiresCA: tax.requiresCA || false,
     };
@@ -65,7 +103,7 @@ const TaxesPage = () => {
 
   const handleFileTax = (taxId: string) => {
     setTaxes(taxes.map(t => 
-      t.id === taxId ? { ...t, status: 'filed' as const } : t
+      t.id === taxId ? { ...t, status: 'filed' } : t
     ));
   };
 
