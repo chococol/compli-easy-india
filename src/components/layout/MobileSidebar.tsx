@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -10,7 +9,11 @@ import {
   CreditCard, 
   Settings,
   ArrowLeft,
-  User
+  User,
+  Shield,
+  Receipt,
+  Scale,
+  Users
 } from 'lucide-react';
 import Logo from '../Logo';
 import { Button } from '@/components/ui/button';
@@ -39,7 +42,11 @@ const clientNavItems = [
   { icon: Home, label: 'Home', path: '/home' },
   { icon: Building, label: 'Organization', path: '/organization' },
   { icon: FileText, label: 'Documents', path: '/documents' },
-  { icon: ClipboardCheck, label: 'Compliances', path: '/compliances' },
+  { icon: ClipboardCheck, label: 'Company Compliances', path: '/company-compliances' },
+  { icon: Shield, label: 'Licenses', path: '/licenses' },
+  { icon: Receipt, label: 'Taxes', path: '/taxes' },
+  { icon: Scale, label: 'Legal Services', path: '/legal-services' },
+  { icon: Users, label: 'Team', path: '/team' },
   { icon: CreditCard, label: 'Payments', path: '/payments' },
   { icon: MessageSquare, label: 'Messages', path: '/messages' },
   { icon: Settings, label: 'Settings', path: '/settings' },
