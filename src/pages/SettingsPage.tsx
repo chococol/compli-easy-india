@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Users, Key, Wrench, HelpCircle, Link } from 'lucide-react';
+import { User, Key, Wrench, HelpCircle, Link } from 'lucide-react';
 
 const SettingsPage = () => {
   const { userProfile } = useAuth();
@@ -22,14 +21,10 @@ const SettingsPage = () => {
         </header>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
+          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Profile</span>
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
             <TabsTrigger value="credentials" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
@@ -120,22 +115,6 @@ const SettingsPage = () => {
               <CardFooter>
                 <Button>Save Changes</Button>
               </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="users" className="space-y-4 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>
-                  Manage team members and their access permissions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  User management features will be available soon. You'll be able to invite team members and manage their roles.
-                </p>
-              </CardContent>
             </Card>
           </TabsContent>
           
