@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, Plus, User, Building, Crown, Star, Calendar, AlertTriangle, Phone, Mail } from 'lucide-react';
+import { Users, Plus, User, Building, Crown, Star, Calendar, AlertTriangle, Phone, Mail, UserPlus, Building2, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MainLayout from '@/components/layout/MainLayout';
@@ -337,17 +337,51 @@ const TeamPage = () => {
                 </Table>
               </Card>
             ) : (
-              <Card className="p-12 text-center">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No team members yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Add individual team members or hire a complete service provider team
-                </p>
-                <Button onClick={() => setIsAddMemberDialogOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add First Team Member
-                </Button>
-              </Card>
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card className="p-8 text-center border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                    <UserPlus className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Add Individual Members</h3>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Add employees, freelancers, or consultants to your team individually
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 mb-4">
+                    <li>• In-house employees</li>
+                    <li>• Freelance specialists</li>
+                    <li>• External consultants</li>
+                  </ul>
+                  <Button onClick={() => setIsAddMemberDialogOpen(true)} className="w-full">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Add Team Member
+                  </Button>
+                </Card>
+
+                <Card className="p-8 text-center border-2 border-dashed border-primary/25 hover:border-primary/50 transition-colors">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Building2 className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Get Complete Team</h3>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Hire a service provider and get all 4 core professionals at once
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 mb-4">
+                    <li>• Compliance Manager</li>
+                    <li>• Chartered Accountant</li>
+                    <li>• Company Secretary</li>
+                    <li>• Lawyer</li>
+                  </ul>
+                  <Button 
+                    onClick={() => setIsChangeProviderDialogOpen(true)} 
+                    variant="outline" 
+                    className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Building2 className="mr-2 h-4 w-4" />
+                    View Service Providers
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Card>
+              </div>
             )}
           </TabsContent>
 
@@ -434,18 +468,49 @@ const TeamPage = () => {
               </div>
             ) : (
               <Card className="p-12 text-center">
-                <Building className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No service provider selected</h3>
-                <p className="text-muted-foreground mb-4">
-                  Select a service provider to get a complete professional team
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Building2 className="h-10 w-10 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">No Service Provider Selected</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Get a complete professional team with all essential compliance roles from a trusted service provider
                 </p>
-                <Button onClick={() => setIsChangeProviderDialogOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Select Service Provider
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-2xl mx-auto">
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <p className="text-sm font-medium">Compliance Manager</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-green-600" />
+                    </div>
+                    <p className="text-sm font-medium">Chartered Accountant</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <p className="text-sm font-medium">Company Secretary</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <p className="text-sm font-medium">Lawyer</p>
+                  </div>
+                </div>
+
+                <Button onClick={() => setIsChangeProviderDialogOpen(true)} size="lg">
+                  <Building2 className="mr-2 h-5 w-5" />
+                  Choose Service Provider
                 </Button>
               </Card>
             )}
 
+            {/* Service Provider Selection Dialog */}
             <Dialog open={isChangeProviderDialogOpen} onOpenChange={setIsChangeProviderDialogOpen}>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
