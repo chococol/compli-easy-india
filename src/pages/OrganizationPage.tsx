@@ -6,6 +6,7 @@ import { Building, Users, User, Crown, TrendingUp } from 'lucide-react';
 import CompanyDetailsSection from '@/components/company/CompanyDetailsSection';
 import DirectorsSection from '@/components/company/DirectorsSection';
 import ShareholdersSection from '@/components/company/ShareholdersSection';
+import AddAssetDialog from '@/components/assets/AddAssetDialog';
 
 // Dummy data for company details
 const dummyCompanyData = {
@@ -114,6 +115,47 @@ const dummyShareholders = [
 
 const OrganizationPage = () => {
   const [activeTab, setActiveTab] = useState('organization');
+  // LOCAL state for organization assets
+  const [assets, setAssets] = useState([
+    {
+      id: '1',
+      type: 'Subsidiary Entity',
+      name: 'ABC Tech Solutions Pvt Ltd',
+      ownership: '75%',
+      location: 'Mumbai, Maharashtra',
+      acquiredDate: '2021-03-15',
+      value: '₹50,00,000'
+    },
+    {
+      id: '2',
+      type: 'Commercial Property',
+      name: 'Office Complex - Sector 18',
+      ownership: '100%',
+      location: 'Gurgaon, Haryana',
+      acquiredDate: '2020-08-20',
+      value: '₹2,50,00,000'
+    },
+    {
+      id: '3',
+      type: 'Intellectual Property',
+      name: 'Software Patent - ABC CRM',
+      ownership: '100%',
+      location: 'India',
+      acquiredDate: '2022-01-10',
+      value: '₹15,00,000'
+    }
+  ]);
+
+  // Remove dummyAssets; use new local assets state!
+  const handleAddAsset = (asset: any) => {
+    setAssets([
+      ...assets,
+      {
+        ...asset,
+        id: Date.now().toString()
+      }
+    ]);
+  };
 
   return (
     <MainLayout>
@@ -158,7 +200,7 @@ const OrganizationPage = () => {
           </TabsContent>
           
           <TabsContent value="assets" className="mt-6">
-            <AssetsSection />
+            <AssetsSection assets={assets} onAddAsset={handleAddAsset} />
           </TabsContent>
         </Tabs>
       </div>
@@ -166,85 +208,76 @@ const OrganizationPage = () => {
   );
 };
 
-const AssetsSection = () => {
-  const dummyAssets = [
-    {
-      id: '1',
-      type: 'Subsidiary Entity',
-      name: 'ABC Tech Solutions Pvt Ltd',
-      ownership: '75%',
-      location: 'Mumbai, Maharashtra',
-      acquiredDate: '2021-03-15',
-      value: '₹50,00,000'
-    },
-    {
-      id: '2',
-      type: 'Commercial Property',
-      name: 'Office Complex - Sector 18',
-      ownership: '100%',
-      location: 'Gurgaon, Haryana',
-      acquiredDate: '2020-08-20',
-      value: '₹2,50,00,000'
-    },
-    {
-      id: '3',
-      type: 'Intellectual Property',
-      name: 'Software Patent - ABC CRM',
-      ownership: '100%',
-      location: 'India',
-      acquiredDate: '2022-01-10',
-      value: '₹15,00,000'
-    }
-  ];
-
+// Refactored: AssetsSection uses passed-in props.
+const AssetsSection = ({
+  assets,
+  onAddAsset,
+}: {
+  assets: any[];
+  onAddAsset: (asset: any) => void;
+}) => {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Asset Portfolio</CardTitle>
-          <CardDescription>
-            Assets, subsidiaries, and properties owned by your organization
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Asset Portfolio</CardTitle>
+            <CardDescription>
+              Assets, subsidiaries, and properties owned by your organization
+            </CardDescription>
+          </div>
+          {assets.length > 0 && (
+            <AddAssetDialog onAdd={onAddAsset} />
+          )}
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
-            {dummyAssets.map((asset) => (
-              <Card key={asset.id} className="p-4">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-lg">{asset.name}</span>
-                      <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">
-                        {asset.type}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
-                      <div>
-                        <span className="font-medium">Ownership:</span>
-                        <br />
-                        {asset.ownership}
+          {assets.length === 0 ? (
+            <div className="flex flex-col items-center py-16 text-center text-muted-foreground space-y-4">
+              <TrendingUp className="mx-auto h-10 w-10 text-muted" />
+              <div className="font-semibold text-lg text-foreground">No assets added yet</div>
+              <p className="text-sm">Add your first asset or property to document your organization's tangible and intangible value.</p>
+              <AddAssetDialog onAdd={onAddAsset} />
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {assets.map((asset) => (
+                <Card key={asset.id} className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-lg">{asset.name}</span>
+                        <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">
+                          {asset.type}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-medium">Location:</span>
-                        <br />
-                        {asset.location}
-                      </div>
-                      <div>
-                        <span className="font-medium">Acquired:</span>
-                        <br />
-                        {asset.acquiredDate}
-                      </div>
-                      <div>
-                        <span className="font-medium">Value:</span>
-                        <br />
-                        {asset.value}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
+                        <div>
+                          <span className="font-medium">Ownership:</span>
+                          <br />
+                          {asset.ownership}
+                        </div>
+                        <div>
+                          <span className="font-medium">Location:</span>
+                          <br />
+                          {asset.location}
+                        </div>
+                        <div>
+                          <span className="font-medium">Acquired:</span>
+                          <br />
+                          {asset.acquiredDate}
+                        </div>
+                        <div>
+                          <span className="font-medium">Value:</span>
+                          <br />
+                          {asset.value}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
