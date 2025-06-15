@@ -1,22 +1,21 @@
 
 import React from 'react';
 import { NavLink, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  Layers, 
-  CheckCircle2, 
-  Scale, 
-  FileText, 
-  Briefcase, 
-  Users, 
-  Building2, 
+import {
+  Home,
+  Layers,
+  CheckCircle2,
+  Scale,
+  FileText,
+  Briefcase,
+  Users,
+  Building2,
   Settings,
   ArrowLeft,
   User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Dummy client data for display
 const dummyClients: { [key: string]: string } = {
   '1': 'Tech Solutions Inc.',
   '2': 'Green Energy Corp.',
@@ -25,7 +24,7 @@ const dummyClients: { [key: string]: string } = {
 
 const navMain = [
   { icon: Home, label: 'Home', path: '/home' },
-  { icon: Layers, label: 'Assets', path: '/assets' },
+  { icon: Layers, label: 'Assets', path: '/assets' },       // Now includes Licenses/IPR
   { icon: CheckCircle2, label: 'Compliances', path: '/compliances' },
   { icon: Scale, label: 'Taxes', path: '/taxes' },
   { icon: Briefcase, label: 'Services', path: '/services' },
@@ -45,24 +44,22 @@ const ClientSidebar = () => {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  
-  // Check if this is being viewed by a professional using new route structure
+
   const isProfessionalView = location.pathname.startsWith('/professional/') && params.clientId;
   const clientId = params.clientId;
   const clientName = clientId ? dummyClients[clientId] || `Client ${clientId}` : '';
-  
-  // Adjust paths based on context
+
   const getNavPath = (basePath: string) => {
     if (isProfessionalView && clientId) {
       return `/professional/${clientId}${basePath}`;
     }
     return `/client${basePath}`;
   };
-  
+
   const handleBackToProfessional = () => {
     navigate('/professional/home');
   };
-  
+
   return (
     <aside className="flex flex-col h-screen w-64 border-r bg-card p-4">
       {isProfessionalView && (
@@ -74,10 +71,10 @@ const ClientSidebar = () => {
           <div className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
             {clientName}
           </div>
-          <Button 
+          <Button
             onClick={handleBackToProfessional}
-            variant="outline" 
-            size="sm" 
+            variant="outline"
+            size="sm"
             className="w-full"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -86,16 +83,17 @@ const ClientSidebar = () => {
         </div>
       )}
 
+      {/* Main Navigation */}
       <nav className="flex-1 flex flex-col gap-2">
         <div className="space-y-1">
           {navMain.map((item) => (
             <NavLink
               key={item.path}
               to={getNavPath(item.path)}
-              className={({ isActive }) => 
+              className={({ isActive }) =>
                 `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary font-medium' 
+                  isActive
+                    ? 'bg-primary/10 text-primary font-medium'
                     : 'text-foreground hover:bg-muted'
                 }`
               }
@@ -114,10 +112,10 @@ const ClientSidebar = () => {
             <NavLink
               key={item.path}
               to={getNavPath(item.path)}
-              className={({ isActive }) => 
+              className={({ isActive }) =>
                 `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary font-medium' 
+                  isActive
+                    ? 'bg-primary/10 text-primary font-medium'
                     : 'text-foreground hover:bg-muted'
                 }`
               }
@@ -128,19 +126,20 @@ const ClientSidebar = () => {
           ))}
         </div>
       </nav>
-      
+
       {/* Divider above Organization/Settings */}
       <div className="mb-2 border-t" />
 
-      <nav className="flex flex-col gap-1">
+      {/* Organization Details and Settings at the bottom */}
+      <nav className="flex flex-col gap-1 mt-auto">
         {navBottom.map((item) => (
           <NavLink
             key={item.path}
             to={getNavPath(item.path)}
-            className={({ isActive }) => 
+            className={({ isActive }) =>
               `flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                isActive 
-                  ? 'bg-primary/10 text-primary font-medium' 
+                isActive
+                  ? 'bg-primary/10 text-primary font-medium'
                   : 'text-foreground hover:bg-muted'
               }`
             }
